@@ -4,17 +4,18 @@ import com.getcapacitor.JSObject
 import com.getcapacitor.PluginCall
 import com.ionic.plugin.android.core.actions.CallContext
 import com.ionic.plugin.core.actions.CallContextResult
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonObject
+import com.spryrocks.kson.JsonObject
 
-class CallContext(private val call: PluginCall, wrapperDelegate: WrapperDelegate) : CallContext(wrapperDelegate) {
+class CallContext(private val call: PluginCall, wrapperDelegate: WrapperDelegate) :
+    CallContext(wrapperDelegate) {
     override fun getString(key: String): String? {
-        return call.getString(key)
+        return if (call.hasOption(key)) call.getString(key) else null
     }
 
-    override fun getObject(key: String): String? {
-        return call.getObject(key)?.toString()
+    override fun getObject(key: String): JsonObject? {
+        if (!call.hasOption(key)) return null
+        val jsonString = call.getObject(key).toString()
+        return JsonObject.fromJson(jsonString)
     }
 
     override fun result(result: CallContextResult) {

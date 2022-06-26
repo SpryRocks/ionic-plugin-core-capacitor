@@ -5,8 +5,6 @@ import com.getcapacitor.PluginCall
 import com.ionic.plugin.android.capacitor.core.actions.CallContext
 import com.ionic.plugin.android.capacitor.core.actions.Delegate
 import com.ionic.plugin.android.capacitor.core.actions.WrapperDelegate
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 
 abstract class CapacitorPluginWrapper<TActionKey, TDelegate : Delegate> :
     com.getcapacitor.Plugin() {
@@ -22,9 +20,7 @@ abstract class CapacitorPluginWrapper<TActionKey, TDelegate : Delegate> :
     abstract fun createPlugin(): Plugin<TActionKey, TDelegate>
 
     override fun load() {
-        GlobalScope.launch {
-            plugin.load().await()
-        }
+      plugin.load()
     }
 
     protected fun call(action: TActionKey, call: PluginCall) {

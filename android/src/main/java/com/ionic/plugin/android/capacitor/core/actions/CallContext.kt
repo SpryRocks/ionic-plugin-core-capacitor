@@ -1,34 +1,57 @@
 package com.ionic.plugin.android.capacitor.core.actions
 
-import com.getcapacitor.JSObject
 import com.getcapacitor.PluginCall
+import com.ionic.plugin.android.capacitor.core.toJSObject
 import com.ionic.plugin.android.core.actions.CallContext
 import com.ionic.plugin.core.actions.CallContextResult
 import com.spryrocks.kson.JsonObject
 
 class CallContext(private val call: PluginCall, wrapperDelegate: WrapperDelegate) :
-    CallContext(wrapperDelegate) {
-    override fun getString(key: String): String? {
-        return if (call.hasOption(key)) call.getString(key) else null
+  CallContext(wrapperDelegate) {
+  override fun getString(key: String) = nullable(key) { call.getString(key) }
+
+  override fun getInt(key: String) = nullable(key) { call.getInt(key) }
+
+  override fun getBoolean(key: String) = nullable(key) { call.getBoolean(key) }
+
+  override fun getDouble(key: String) = nullable(key) { call.getDouble(key) }
+
+  override fun getObject(key: String) = nullable(key) {
+    val jsonString = call.getObject(key).toString()
+    return@nullable JsonObject.fromJson(jsonString)
+  }
+
+  private fun <T> nullable(key: String, getter: () -> T): T? {
+    if (!call.hasOption(key)) return null
+    return getter()
+  }
+
+  override fun result(result: CallContextResult, finish: Boolean) {
+    if (!finish) call.setKeepAlive(true)
+    when (result) {
+      is CallContextResult.Success -> success(result.data)
+      is CallContextResult.Error -> error(result.error)
+      else -> error(null)
+    }
+  }
+
+  private fun success(data: JsonObject?) {
+    call.resolve(data?.toJSObject())
+  }
+
+  private fun error(error: Throwable?) {
+    val exception: Exception? = when (error) {
+      is Exception -> error
+      is Throwable -> Exception(error)
+      else -> null
     }
 
-    override fun getObject(key: String): JsonObject? {
-        if (!call.hasOption(key)) return null
-        val jsonString = call.getObject(key).toString()
-        return JsonObject.fromJson(jsonString)
-    }
+    val defaultMessage = "Unknown message"
 
-    override fun result(result: CallContextResult) {
-        if (result.ok) {
-            val data = getResultJsonObject(result)
-            call.resolve(data)
-        } else {
-            call.reject("Error")
-        }
+    if (exception != null) {
+      call.reject(exception.message ?: defaultMessage, exception)
+    } else {
+      call.reject(defaultMessage)
     }
-
-    private fun getResultJsonObject(result: CallContextResult): JSObject? {
-        if (result.data == null) return null
-        return JSObject(result.data.toString())
-    }
+  }
 }

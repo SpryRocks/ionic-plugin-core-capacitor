@@ -5,7 +5,7 @@ import com.ionic.plugin.android.capacitor.core.actions.WrapperDelegate
 
 abstract class Plugin<TActionKey, TDelegate : Delegate> :
     com.ionic.plugin.android.core.Plugin<TActionKey, TDelegate>() {
-    internal fun init(wrapperDelegate: WrapperDelegate) {
-        super.init(wrapperDelegate)
+    internal fun initialize(wrapperDelegate: WrapperDelegate) {
+        super.initialize(wrapperDelegate)
     }
 }

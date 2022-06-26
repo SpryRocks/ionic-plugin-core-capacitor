@@ -16,7 +16,7 @@ abstract class CapacitorPluginWrapper<TActionKey, TDelegate : Delegate> :
 
     init {
         plugin = createPlugin()
-        plugin.init(wrapperDelegate)
+        plugin.initialize(wrapperDelegate)
     }
 
     abstract fun createPlugin(): Plugin<TActionKey, TDelegate>

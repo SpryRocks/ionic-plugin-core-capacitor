@@ -1,4 +1,11 @@
+ext {
+    cordovaAndroidVersion = project.hasProperty('cordovaAndroidVersion') ? project.cordovaAndroidVersion : '7.0.0'
+}
+
 buildscript {
+    ext {
+        androidToolsBuildGradleVersion = project.hasProperty('androidToolsBuildGradleVersion') ? project.androidToolsBuildGradleVersion : '4.2.2'
+    }
     repositories {
         google()
         jcenter()

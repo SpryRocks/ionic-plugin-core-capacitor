@@ -1,9 +1,10 @@
 {
   "name": "@spryrocks/capacitor-ionic-core-plugin",
-  "version": "0.0.1-alpha.2",
+  "version": "0.0.1-alpha.3",
   "description": "Ionic plugin core capacitor",
   "files": [
-    "android", "ios"
+    "android",
+    "ios"
   ],
   "dependencies": {
     "@capacitor/android": "^3.0.0"

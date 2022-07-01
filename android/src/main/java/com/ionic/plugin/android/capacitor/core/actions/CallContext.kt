@@ -4,6 +4,7 @@ import com.getcapacitor.PluginCall
 import com.ionic.plugin.android.capacitor.core.toJSObject
 import com.ionic.plugin.android.core.actions.CallContext
 import com.ionic.plugin.core.actions.CallContextResult
+import com.spryrocks.kson.JsonArray
 import com.spryrocks.kson.JsonObject
 
 class CallContext(private val call: PluginCall, wrapperDelegate: WrapperDelegate) :
@@ -16,9 +17,14 @@ class CallContext(private val call: PluginCall, wrapperDelegate: WrapperDelegate
 
   override fun getDouble(key: String) = nullable(key) { call.getDouble(key) }
 
-  override fun getObject(key: String) = nullable(key) {
+  override fun getJsonObject(key: String) = nullable(key) {
     val jsonString = call.getObject(key).toString()
     return@nullable JsonObject.fromJson(jsonString)
+  }
+
+  override fun getJsonArray(key: String) = nullable(key) {
+    val jsonString = call.getArray(key).toString()
+    return@nullable JsonArray.fromJson(jsonString)
   }
 
   private fun <T> nullable(key: String, getter: () -> T): T? {

@@ -1,10 +1,15 @@
 ext {
     cordovaAndroidVersion = project.hasProperty('cordovaAndroidVersion') ? project.cordovaAndroidVersion : '7.0.0'
+    kotlinxCoroutines = project.hasProperty('kotlinxCoroutines') ? project.kotlinxCoroutines : '1.6.2'
+    ionicPluginCore = project.hasProperty('ionicPluginCore') ? project.ionicPluginCore : '0.0.1-alpha.5'
+    androidxAppCompatVersion = project.hasProperty('androidxAppCompatVersion') ? project.androidxAppCompatVersion : '1.4.2'
+    kotlinxSerializationJson = project.hasProperty('kotlinxSerializationJson') ? project.kotlinxSerializationJson : '1.3.3'
 }
 
 buildscript {
     ext {
         androidToolsBuildGradleVersion = project.hasProperty('androidToolsBuildGradleVersion') ? project.androidToolsBuildGradleVersion : '4.2.2'
+        kotlin_version = project.hasProperty('kotlin_version') ? project.androidToolsBuildGradleVersion : '1.7.0'
     }
     repositories {
         google()
@@ -12,6 +17,7 @@ buildscript {
     }
     dependencies {
         classpath "com.android.tools.build:gradle:$androidToolsBuildGradleVersion"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 

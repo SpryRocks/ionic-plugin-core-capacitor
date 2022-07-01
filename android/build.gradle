@@ -9,7 +9,7 @@ ext {
 buildscript {
     ext {
         androidToolsBuildGradleVersion = project.hasProperty('androidToolsBuildGradleVersion') ? project.androidToolsBuildGradleVersion : '4.2.2'
-        kotlin_version = project.hasProperty('kotlin_version') ? project.androidToolsBuildGradleVersion : '1.7.0'
+        kotlin_version = project.hasProperty('kotlin_version') ? project.kotlin_version : '1.7.0'
     }
     repositories {
         google()

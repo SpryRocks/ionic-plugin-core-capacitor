@@ -33,7 +33,7 @@ class CallContext(private val call: PluginCall, wrapperDelegate: WrapperDelegate
   }
 
   override fun result(result: CallContextResult, finish: Boolean) {
-    if (!finish) call.setKeepAlive(true)
+//    if (!finish) call.setKeepAlive(true)
     when (result) {
       is CallContextResult.Success -> success(result.data)
       is CallContextResult.Error -> error(result.error)

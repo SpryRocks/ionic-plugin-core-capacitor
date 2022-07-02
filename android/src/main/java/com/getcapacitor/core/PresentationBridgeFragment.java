@@ -1,26 +1,33 @@
 package com.getcapacitor.core;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.core.cwac.PresentationFragment;
 import android.os.Bundle;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebView;
 
 import androidx.fragment.app.Fragment;
 
 import com.getcapacitor.Bridge;
-import com.getcapacitor.CapConfig;
 import com.getcapacitor.Logger;
 import com.getcapacitor.Plugin;
-import com.getcapacitor.WebViewListener;
 import com.getcapacitor.android.R;
+import com.getcapacitor.cordova.MockCordovaInterfaceImpl;
+import com.getcapacitor.cordova.MockCordovaWebViewImpl;
+
+import org.apache.cordova.ConfigXmlParser;
+import org.apache.cordova.CordovaPreferences;
+import org.apache.cordova.PluginEntry;
+import org.apache.cordova.PluginManager;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import android.core.cwac.PresentationFragment;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -28,16 +35,18 @@ import android.core.cwac.PresentationFragment;
  * create an instance of this fragment.
  */
 public class PresentationBridgeFragment extends PresentationFragment {
-
     private static final String ARG_START_DIR = "startDir";
-
+    private WebView webView;
     protected Bridge bridge;
+    protected MockCordovaInterfaceImpl cordovaInterface;
     protected boolean keepRunning = true;
+    private ArrayList<PluginEntry> pluginEntries;
+    private PluginManager pluginManager;
+    private CordovaPreferences preferences;
+    private MockCordovaWebViewImpl mockWebView;
 
-    private final List<Class<? extends Plugin>> initialPlugins = new ArrayList<>();
-    private CapConfig config = null;
-
-    private final List<WebViewListener> webViewListeners = new ArrayList<>();
+    private List<Class<? extends Plugin>> initialPlugins = new ArrayList<>();
+    private JSONObject config = new JSONObject();
 
     public PresentationBridgeFragment() {
         // Required empty public constructor
@@ -58,27 +67,19 @@ public class PresentationBridgeFragment extends PresentationFragment {
         return fragment;
     }
 
+    protected void init(Bundle savedInstanceState) {
+        loadConfig(this.getActivity().getApplicationContext(), this.getActivity());
+    }
+
     public void addPlugin(Class<? extends Plugin> plugin) {
         this.initialPlugins.add(plugin);
-    }
-
-    public void setConfig(CapConfig config) {
-        this.config = config;
-    }
-
-    public Bridge getBridge() {
-        return bridge;
-    }
-
-    public void addWebViewListener(WebViewListener webViewListener) {
-        webViewListeners.add(webViewListener);
     }
 
     /**
      * Load the WebView and create the Bridge
      */
     protected void load(Bundle savedInstanceState) {
-        Logger.debug("Loading Bridge with BridgeFragment");
+        Logger.debug("Starting BridgeActivity");
 
         Bundle args = getArguments();
         String startDir = null;
@@ -87,19 +88,40 @@ public class PresentationBridgeFragment extends PresentationFragment {
             startDir = getArguments().getString(ARG_START_DIR);
         }
 
-        bridge =
-                new Bridge.Builder(this)
-                        .setInstanceState(savedInstanceState)
-                        .setPlugins(initialPlugins)
-                        .setConfig(config)
-                        .addWebViewListeners(webViewListeners)
-                        .create();
+        webView = getView().findViewById(R.id.webview);
+        cordovaInterface = new MockCordovaInterfaceImpl(this.getActivity());
+        if (savedInstanceState != null) {
+            cordovaInterface.restoreInstanceState(savedInstanceState);
+        }
+
+        mockWebView = new MockCordovaWebViewImpl(getActivity().getApplicationContext());
+        mockWebView.init(cordovaInterface, pluginEntries, preferences, webView);
+
+        pluginManager = mockWebView.getPluginManager();
+        cordovaInterface.onCordovaInit(pluginManager);
+
+        if (preferences == null) {
+            preferences = new CordovaPreferences();
+        }
+
+        bridge = new Bridge(this.getActivity(), webView, initialPlugins, cordovaInterface, pluginManager, preferences, config);
 
         if (startDir != null) {
             bridge.setServerAssetPath(startDir);
         }
 
-        this.keepRunning = bridge.shouldKeepRunning();
+        if (savedInstanceState != null) {
+            bridge.restoreInstanceState(savedInstanceState);
+        }
+        this.keepRunning = preferences.getBoolean("KeepRunning", true);
+    }
+
+    public void loadConfig(Context context, Activity activity) {
+        ConfigXmlParser parser = new ConfigXmlParser();
+        parser.parse(context);
+        preferences = parser.getPreferences();
+        preferences.setPreferencesBundle(activity.getIntent().getExtras());
+        pluginEntries = parser.getPluginEntries();
     }
 
     @Override
@@ -129,8 +151,9 @@ public class PresentationBridgeFragment extends PresentationFragment {
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        this.init(savedInstanceState);
         this.load(savedInstanceState);
     }
 
@@ -139,6 +162,9 @@ public class PresentationBridgeFragment extends PresentationFragment {
         super.onDestroy();
         if (this.bridge != null) {
             this.bridge.onDestroy();
+        }
+        if (this.mockWebView != null) {
+            mockWebView.handleDestroy();
         }
     }
 }

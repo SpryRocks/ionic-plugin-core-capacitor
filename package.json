@@ -21,11 +21,12 @@
     "prepublishOnly": "npm run build",
     "compile": "tsc --noEmit"
   },
-  "dependencies": {
+  "peerDependencies": {
     "@capacitor/core": "^2.4.7"
   },
   "devDependencies": {
     "@capacitor/android": "^2.4.7",
+    "@capacitor/core": "^2.4.7",
     "@spryrocks/eslint-config": "^0.2.7-alpha.7",
     "rimraf": "^3.0.2",
     "rollup": "^2.32.0",

@@ -1,5 +1,5 @@
-import {registerPlugin} from '@capacitor/core';
+import {Plugins} from '@capacitor/core';
 
 export const createPlugin = <TPlugin>(pluginName: string): TPlugin => {
-  return registerPlugin<TPlugin>(pluginName);
+  return Plugins[pluginName] as TPlugin;
 };

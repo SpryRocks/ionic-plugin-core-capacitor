@@ -1,6 +1,6 @@
 {
   "name": "@spryrocks/capacitor-ionic-core-plugin",
-  "version": "3.0.0-alpha.4",
+  "version": "3.0.0-alpha.5",
   "description": "Ionic plugin core capacitor",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
@@ -21,10 +21,11 @@
     "prepublishOnly": "npm run build",
     "compile": "tsc --noEmit"
   },
-  "dependencies": {
+  "peerDependencies": {
     "@capacitor/core": "^3.0.0"
   },
   "devDependencies": {
+    "@capacitor/core": "^3.0.0",
     "@capacitor/android": "^3.0.0",
     "@spryrocks/eslint-config": "^0.2.7-alpha.7",
     "rimraf": "^3.0.2",

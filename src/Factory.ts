@@ -1,13 +1,14 @@
 import {Plugins, registerPlugin} from '@capacitor/core';
 
 export class Factory<TPlugin> {
-  constructor(protected readonly pluginName: string) {}
+  constructor(protected readonly options: {pluginName: string}) {}
 
-  protected async getPlugin(): Promise<TPlugin> {
+  public getPlugin(): TPlugin {
+    const pluginName = this.options.pluginName;
     if (registerPlugin) {
-      return registerPlugin<TPlugin>(this.pluginName);
+      return registerPlugin<TPlugin>(pluginName);
     } else {
-      return Plugins[this.pluginName] as TPlugin;
+      return Plugins[pluginName] as TPlugin;
     }
   }
 }

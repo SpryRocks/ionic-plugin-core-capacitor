@@ -1,7 +1,6 @@
 import * as cap from '@capacitor/core';
 
-export const createPlugin = <TPlugin>(options: {pluginName: string}): TPlugin => {
-  const pluginName = options.pluginName;
+export const createPlugin = <TPlugin>(pluginName: string): TPlugin => {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   if (cap.registerPlugin) {

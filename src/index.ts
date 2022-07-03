@@ -1,1 +1,1 @@
-export {Factory} from './Factory';
+export {createPlugin} from './Factory';

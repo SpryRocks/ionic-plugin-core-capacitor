@@ -1,13 +1,35 @@
 {
   "name": "@spryrocks/capacitor-ionic-core-plugin",
-  "version": "0.0.1-alpha.6",
+  "version": "3.0.0-alpha.0",
   "description": "Ionic plugin core capacitor",
+  "main": "dist/plugin.cjs.js",
+  "module": "dist/esm/index.js",
+  "types": "dist/esm/index.d.ts",
+  "unpkg": "dist/plugin.js",
   "files": [
-    "android",
-    "ios"
+    "android/src/main/",
+    "android/build.gradle",
+    "dist/"
   ],
+  "scripts": {
+    "compile:native": "npm run build:android",
+    "build:android": "(cd android && ./gradlew build)",
+    "lint": "eslint './**/*.{ts,tsx}' --cache",
+    "build": "npm run clean && tsc && rollup -c rollup.config.js",
+    "clean": "rimraf ./dist",
+    "build:develop": "tsc --watch",
+    "prepublishOnly": "npm run build",
+    "compile": "tsc --noEmit"
+  },
   "dependencies": {
-    "@capacitor/android": "^3.0.0"
+    "@capacitor/core": "^3.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/android": "^3.0.0",
+    "rimraf": "^3.0.2",
+    "rollup": "^2.32.0",
+    "typescript": "^4.7.4",
+    "@spryrocks/eslint-config": "^0.2.7-alpha.7"
   },
   "publishConfig": {
     "access": "public"

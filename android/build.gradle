@@ -59,6 +59,7 @@ dependencies {
     implementation "com.github.SpryRocks.ionic-plugin-core:core:$ionicPluginCore"
     implementation "com.github.SpryRocks.ionic-plugin-core:android:$ionicPluginCore"
     implementation "com.github.SpryRocks.ionic-plugin-core:kson:$ionicPluginCore"
+    implementation "com.github.SpryRocks.ionic-plugin-core:cwac:$ionicPluginCore"
     implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinxSerializationJson"
 }

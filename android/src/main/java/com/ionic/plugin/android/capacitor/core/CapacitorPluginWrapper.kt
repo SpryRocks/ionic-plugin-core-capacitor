@@ -20,7 +20,7 @@ abstract class CapacitorPluginWrapper<TActionKey, TDelegate : Delegate> :
     abstract fun createPlugin(): Plugin<TActionKey, TDelegate>
 
     override fun load() {
-      plugin.load()
+        plugin.load()
     }
 
     protected fun call(action: TActionKey, call: PluginCall) {

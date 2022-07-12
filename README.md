@@ -4,7 +4,7 @@
 
 ## Capacitor 3
 
-`yarn install @spryrocks/capacitor-ionic-core-plugin@3.0.0-alpha.10`
+`yarn install @spryrocks/capacitor-ionic-core-plugin@3.0.0-alpha.11`
 
 ## Capacitor 2
 
@@ -12,7 +12,7 @@
 
 # Repository
 
-https://github.com/SpryRocks/ionic-plugin-core-capacitor
+[https://github.com/SpryRocks/ionic-plugin-core-capacitor](https://github.com/SpryRocks/ionic-plugin-core-capacitor)
 
 # Publish
 

@@ -1,6 +1,7 @@
 package com.ionic.plugin.android.capacitor.core.actions
 
 import com.getcapacitor.PluginCall
+import com.ionic.plugin.android.capacitor.core.WrapperDelegate
 import com.ionic.plugin.android.capacitor.core.toJSObject
 import com.ionic.plugin.android.core.actions.CallContext
 import com.ionic.plugin.core.actions.CallContextResult

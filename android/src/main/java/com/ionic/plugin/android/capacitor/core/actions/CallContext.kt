@@ -47,7 +47,7 @@ class CallContext(private val call: PluginCall, wrapperDelegate: WrapperDelegate
     return@nullable JsonObject.fromJson(jsonString)
   }
 
-  override fun optLong(name: String) = nullable(name) { call.getLong(name) }
+  override fun optLong(name: String) = nullable(name) { call.getInt(name).toLong() }
 
   override fun optNumber(name: String) = throw NotImplementedError()
 

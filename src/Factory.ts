@@ -1,5 +1,9 @@
+import {CreatePlugin, PluginRegistration} from './IFactory';
 import {registerPlugin} from '@capacitor/core';
 
-export const createPlugin = <TPlugin>(pluginName: string): TPlugin => {
-  return registerPlugin<TPlugin>(pluginName);
+export const createPlugin: CreatePlugin = <TPlugin>(
+  pluginName: string,
+  options?: {web?: PluginRegistration},
+): TPlugin => {
+  return registerPlugin<TPlugin>(pluginName, {web: options?.web});
 };

@@ -10,34 +10,49 @@ import com.spryrocks.kson.JsonObject
 
 class CallContext(private val call: PluginCall, wrapperDelegate: WrapperDelegate) :
   CallContext(wrapperDelegate) {
-  override fun getBoolean(key: String) = require(key, ::optBoolean)
+  override fun get(name: String) = throw NotImplementedError()
+
+  override fun getBoolean(name: String) = require(name, ::optBoolean)
+
+  override fun getFloat(name: String) = require(name, ::optFloat)
 
   override fun getDouble(key: String) = require(key, ::optDouble)
 
-  override fun getInt(key: String) = require(key, ::optInt)
+  override fun getInt(name: String) = require(name, ::optInt)
 
-  override fun getJsonArray(key: String) = require(key, ::optJsonArray)
+  override fun getJsonArray(name: String) = require(name, ::optJsonArray)
 
+  override fun getJsonObject(name: String) = require(name, ::optJsonObject)
 
-  override fun getJsonObject(key: String) = require(key, ::optJsonObject)
+  override fun getLong(name: String) = require(name, ::optLong)
 
-  override fun getString(key: String) = require(key, ::optString)
+  override fun getNumber(name: String) = throw NotImplementedError()
 
-  override fun optString(key: String) = nullable(key) { call.getString(key) }
+  override fun getString(name: String) = require(name, ::optString)
 
-  override fun optInt(key: String) = nullable(key) { call.getInt(key) }
+  override fun opt(name: String) = throw NotImplementedError()
 
-  override fun optBoolean(key: String) = nullable(key) { call.getBoolean(key) }
+  override fun optString(name: String) = nullable(name) { call.getString(name) }
+
+  override fun optInt(name: String) = nullable(name) { call.getInt(name) }
+
+  override fun optBoolean(name: String) = nullable(name) { call.getBoolean(name) }
+
+  override fun optFloat(name: String) = nullable(name) { call.getFloat(name) }
 
   override fun optDouble(key: String) = nullable(key) { call.getDouble(key) }
 
-  override fun optJsonObject(key: String) = nullable(key) {
-    val jsonString = call.getObject(key).toString()
+  override fun optJsonObject(name: String) = nullable(name) {
+    val jsonString = call.getObject(name).toString()
     return@nullable JsonObject.fromJson(jsonString)
   }
 
-  override fun optJsonArray(key: String) = nullable(key) {
-    val jsonString = call.getArray(key).toString()
+  override fun optLong(name: String) = nullable(name) { call.getLong(name) }
+
+  override fun optNumber(name: String) = throw NotImplementedError()
+
+  override fun optJsonArray(name: String) = nullable(name) {
+    val jsonString = call.getArray(name).toString()
     return@nullable JsonArray.fromJson(jsonString)
   }
 

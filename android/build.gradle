@@ -1,5 +1,3 @@
-apply from: "variables.gradle"
-
 ext {
     cordovaAndroidVersion = project.hasProperty('cordovaAndroidVersion') ? project.cordovaAndroidVersion : '7.0.0'
     kotlinxCoroutines = project.hasProperty('kotlinxCoroutines') ? project.kotlinxCoroutines : '1.6.2'

@@ -3,19 +3,18 @@ package com.ionic.plugin.android.capacitor.core
 import android.app.Activity
 import com.getcapacitor.PluginCall
 import com.ionic.plugin.android.capacitor.core.actions.CallContext
-import com.ionic.plugin.android.capacitor.core.actions.Delegate
-import com.ionic.plugin.android.capacitor.core.actions.WrapperDelegate
+import com.ionic.plugin.core.actions.Delegate
 
 abstract class CapacitorPlugin<TActionKey, TDelegate : Delegate> : com.getcapacitor.Plugin() {
-    private val plugin: Plugin<TActionKey, TDelegate>
+    private val plugin: com.ionic.plugin.core.Plugin<TActionKey, TDelegate>
     private val wrapperDelegate = WrapperDelegateImpl(this)
 
     init {
         plugin = createPlugin()
-        plugin.initialize(wrapperDelegate)
+        plugin._initializePluginInternal(wrapperDelegate)
     }
 
-    abstract fun createPlugin(): Plugin<TActionKey, TDelegate>
+    abstract fun createPlugin(): com.ionic.plugin.core.Plugin<TActionKey, TDelegate>
 
     override fun load() {
         plugin.load()

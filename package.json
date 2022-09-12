@@ -1,6 +1,6 @@
 {
   "name": "@spryrocks/capacitor-ionic-core-plugin",
-  "version": "3.0.0-alpha.13",
+  "version": "3.0.0-alpha.14",
   "description": "Ionic plugin core capacitor",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",

@@ -21,7 +21,7 @@ abstract class CapacitorPlugin<TActionKey, TDelegate : Delegate> : com.getcapaci
     }
 
     protected fun call(action: TActionKey, call: PluginCall) {
-        plugin.call(action, CallContext(call, wrapperDelegate))
+        plugin.call(action, CallContext(call, wrapperDelegate, plugin.errorMapper))
     }
 
     class WrapperDelegateImpl<TActionKey, TDelegate : Delegate>(private val wrapper: CapacitorPlugin<TActionKey, TDelegate>) :

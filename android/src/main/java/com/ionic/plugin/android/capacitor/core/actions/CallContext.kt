@@ -15,26 +15,6 @@ class CallContext(
     wrapperDelegate: WrapperDelegate,
     private val errorMapper: IErrorMapper,
 ) : CallContext(wrapperDelegate) {
-    override fun get(name: String) = throw NotImplementedError()
-
-    override fun getBoolean(name: String) = require(name, ::optBoolean)
-
-    override fun getFloat(name: String) = require(name, ::optFloat)
-
-    override fun getDouble(key: String) = require(key, ::optDouble)
-
-    override fun getInt(name: String) = require(name, ::optInt)
-
-    override fun getJsonArray(name: String) = require(name, ::optJsonArray)
-
-    override fun getJsonObject(name: String) = require(name, ::optJsonObject)
-
-    override fun getLong(name: String) = require(name, ::optLong)
-
-    override fun getNumber(name: String) = throw NotImplementedError()
-
-    override fun getString(name: String) = require(name, ::optString)
-
     override fun opt(name: String) = throw NotImplementedError()
 
     override fun optString(name: String) = nullable(name) { call.getString(name) }
@@ -65,9 +45,6 @@ class CallContext(
         if (!call.hasOption(key)) return null
         return getter()
     }
-
-    private fun <T> require(name: String, block: (name: String) -> T?) =
-        block(name) ?: throw Exception("value with name '${name}' is null")
 
     override fun result(result: CallContextResult, finish: Boolean) {
     //    if (!finish) call.setKeepAlive(true)

@@ -63,7 +63,7 @@ class CallContext(
     }
 
     override fun error(error: Throwable?, finish: Boolean) {
-        if (!finish) call.setKeepAlive(true)
+//        if (!finish) call.setKeepAlive(true)
         val exception: Exception? = when (error) {
             is Exception -> error
             is Throwable -> Exception(error)

@@ -1,4 +1,5 @@
 package com.ionic.plugin.android.capacitor.core.actions
 
-interface Delegate : com.ionic.plugin.android.core.actions.Delegate {
-}
+import com.ionic.plugin.core.actions.Mappers
+
+interface Delegate<TMappers: Mappers> : com.ionic.plugin.android.core.actions.Delegate<TMappers>

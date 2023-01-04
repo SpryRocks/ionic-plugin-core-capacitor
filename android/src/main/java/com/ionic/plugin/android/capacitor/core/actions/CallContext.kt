@@ -40,7 +40,13 @@ class CallContext(
 
         override fun optLong(name: String) = nullable(name) { call.getInt(name)?.toLong() }
 
-        override fun optNumber(name: String) = throw NotImplementedError()
+        override fun optNumber(name: String) = nullable(name) {
+            try {
+                return@nullable call.getDouble(name)
+            } catch (e: Throwable) {
+                return@nullable call.getInt(name) as Number
+            }
+        }
 
         override fun optJsonArray(name: String) = nullable(name) {
             val jsonString = call.getArray(name).toString()

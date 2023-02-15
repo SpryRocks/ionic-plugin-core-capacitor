@@ -54,7 +54,9 @@ class CallContext(
         }
 
         private fun <T> nullable(key: String, getter: () -> T): T? {
-            if (!call.hasOption(key)) return null
+            val data = call.data
+            if (!data.has(key)) return null
+            if (data.isNull(key)) return null
             return getter()
         }
     }

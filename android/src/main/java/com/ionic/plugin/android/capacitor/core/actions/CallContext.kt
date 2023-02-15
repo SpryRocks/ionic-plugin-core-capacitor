@@ -8,8 +8,6 @@ import com.ionic.plugin.core.PluginException
 import com.ionic.plugin.core.actions.Mappers
 import com.spryrocks.kson.JsonArray
 import com.spryrocks.kson.JsonObject
-import kotlinx.serialization.Serializable
-import kotlin.reflect.full.hasAnnotation
 
 class CallContext(
     private val call: PluginCall,
@@ -56,7 +54,9 @@ class CallContext(
         }
 
         private fun <T> nullable(key: String, getter: () -> T): T? {
-            if (!call.hasOption(key)) return null
+            val data = call.data
+            if (!data.has(key)) return null
+            if (data.isNull(key)) return null
             return getter()
         }
     }
@@ -66,8 +66,6 @@ class CallContext(
         when(data) {
             null -> call.resolve()
             is JsonObject -> call.resolve(data.toJSObject())
-            data::class.hasAnnotation<Serializable>() ->
-                call.resolve(JsonObject.fromObject(data).toJSObject())
             else -> throw NotImplementedError("This data type is not supported")
         }
     }

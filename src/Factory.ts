@@ -1,4 +1,5 @@
 import {CreatePlugin, PluginRegistration} from './IFactory';
+import {IDefinitions, PluginProxy} from './definitions';
 import {Plugins} from '@capacitor/core';
 
 export const createPlugin: CreatePlugin = <TPlugin>(
@@ -7,3 +8,10 @@ export const createPlugin: CreatePlugin = <TPlugin>(
 ): TPlugin => {
   return Plugins[pluginName] as TPlugin;
 };
+
+export const createPluginProxy = <TDefinitions extends IDefinitions>(
+  pluginName: string,
+  options?: {
+    web?: PluginRegistration;
+  },
+) => createPlugin<PluginProxy<TDefinitions>>(pluginName, options);

@@ -1,0 +1,8 @@
+framework module IonicPluginCore {
+    umbrella header "IonicPluginCore.h"
+
+    export *
+    module * { export * }
+
+    use Foundation
+}

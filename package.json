@@ -6,6 +6,11 @@
   "module": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
   "unpkg": "dist/plugin.js",
+  "license": "MIT",
+  "author": "",
+  "repository": {
+    "url": "https://github.com/SpryRocks/ionic-plugin-core-capacitor"
+  },
   "files": [
     "android/src/main/",
     "android/build.gradle",
@@ -38,6 +43,9 @@
   "capacitor": {
     "android": {
       "src": "android"
+    },
+    "ios": {
+      "src": "ios"
     }
   }
 }

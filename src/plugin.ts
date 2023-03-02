@@ -13,8 +13,26 @@ export abstract class CapacitorPlugin<
     method: TMethod,
     options: TDefinitions[TMethod]['options'],
   ): Promise<TDefinitions[TMethod]['result']> {
-    return this.plugin[method](options).catch((error) =>
+    return this.plugin[method](options, undefined).catch((error) =>
       this.mappers.handlePluginError(error),
     );
+  }
+
+  protected observe<TMethod extends keyof TDefinitions>(
+    method: TMethod,
+    options: TDefinitions[TMethod]['options'],
+    callback: {
+      next: (result: TDefinitions[TMethod]['result']) => void;
+      error: (error: unknown) => void;
+    },
+  ): Promise<string> {
+    return this.plugin[method](options, (data, error) => {
+      if (error) {
+        callback.error(this.mappers.handlePluginError(error));
+        return;
+      }
+
+      callback.next(data);
+    }) as Promise<string>;
   }
 }

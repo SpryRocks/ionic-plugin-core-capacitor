@@ -4,8 +4,14 @@ export type IDefinitions = {
   [name: string]: IAction<unknown, unknown>;
 };
 
+type PluginCallback<TData> = (
+  data: TData | undefined,
+  error: unknown | undefined,
+) => void;
+
 export type PluginProxy<TDefinitions extends IDefinitions> = {
   [name in keyof TDefinitions]: (
     options: TDefinitions[name]['options'],
-  ) => Promise<TDefinitions[name]['result']>;
+    callback: PluginCallback<TDefinitions[name]['result']> | undefined,
+  ) => Promise<TDefinitions[name]['result'] | string>;
 };

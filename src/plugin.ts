@@ -33,6 +33,6 @@ export abstract class CapacitorPlugin<
       }
 
       callback.next(data);
-    }) as Promise<string>;
+    }).catch((error) => callback.error(error)) as Promise<string>;
   }
 }

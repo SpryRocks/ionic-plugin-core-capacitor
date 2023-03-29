@@ -26,13 +26,14 @@ export abstract class CapacitorPlugin<
       error: (error: unknown) => void;
     },
   ): Promise<string> {
-    return this.plugin[method](options, (data, error) => {
+    const result = this.plugin[method](options, (data, error) => {
       if (error) {
         callback.error(this.mappers.handlePluginError(error));
         return;
       }
 
       callback.next(data);
-    }).catch((error) => callback.error(error)) as Promise<string>;
+    }) as Promise<string>;
+    return result.catch((error) => callback.error(error)) as Promise<string>;
   }
 }

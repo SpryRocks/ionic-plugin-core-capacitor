@@ -13,9 +13,9 @@ export abstract class CapacitorPlugin<
     method: TMethod,
     options: TDefinitions[TMethod]['options'],
   ): Promise<TDefinitions[TMethod]['result']> {
-    return this.plugin[method](options, undefined).catch((error) =>
-      this.mappers.handlePluginError(error),
-    );
+    return (
+      this.plugin[method](options, undefined) as Promise<TDefinitions[TMethod]['result']>
+    ).catch((error) => this.mappers.handlePluginError(error));
   }
 
   protected observe<TMethod extends keyof TDefinitions>(
@@ -26,13 +26,14 @@ export abstract class CapacitorPlugin<
       error: (error: unknown) => void;
     },
   ): Promise<string> {
-    return this.plugin[method](options, (data, error) => {
+    const result = this.plugin[method](options, (data, error) => {
       if (error) {
         callback.error(this.mappers.handlePluginError(error));
         return;
       }
 
       callback.next(data);
-    }).catch((error) => callback.error(error)) as Promise<string>;
+    }) as string;
+    return Promise.resolve(result);
   }
 }

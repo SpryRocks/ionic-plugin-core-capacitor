@@ -14,5 +14,5 @@ export type PluginProxy<TDefinitions extends IDefinitions> = {
   [name in keyof TDefinitions]: (
     options: TDefinitions[name]['options'],
     callback: PluginCallback<TDefinitions[name]['result']> | undefined,
-  ) => Promise<TDefinitions[name]['result'] | CallbackId>;
+  ) => Promise<TDefinitions[name]['result']> | CallbackId;
 };

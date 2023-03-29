@@ -62,7 +62,7 @@ class CallContext(
     }
 
     override fun success(data: Any?, finish: Boolean) {
-    //    if (!finish) call.setKeepAlive(true)
+      if (!finish) call.save()
         when(data) {
             null -> call.resolve()
             is JsonObject -> call.resolve(data.toJSObject())
@@ -71,7 +71,7 @@ class CallContext(
     }
 
     override fun error(error: Throwable?, finish: Boolean) {
-//        if (!finish) call.setKeepAlive(true)
+        if (!finish) call.save()
         val exception: Exception? = when (error) {
             is Exception -> error
             is Throwable -> Exception(error)

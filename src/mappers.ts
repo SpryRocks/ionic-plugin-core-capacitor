@@ -17,7 +17,11 @@ export abstract class Mappers {
         message = error_.message;
       }
       if (error_.code && typeof error_.code === 'string') {
-        details = JSON.parse(error_.code);
+        try {
+          details = JSON.parse(error_.code);
+        } catch (e) {
+          details = {};
+        }
       }
     }
     return Promise.reject(this.mapError(message, details));

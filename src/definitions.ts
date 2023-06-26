@@ -10,7 +10,13 @@ type PluginCallback<TData> = (
   error: unknown | undefined,
 ) => void;
 
-export type PluginProxy<TDefinitions extends IDefinitions> = {
+type CapPluginListener = (event: unknown) => void;
+
+type CapPlugin = {
+  addListener: (name: string, listener: CapPluginListener) => void;
+};
+
+export type PluginProxy<TDefinitions extends IDefinitions> = CapPlugin & {
   [name in keyof TDefinitions]: (
     options: TDefinitions[name]['options'],
     callback: PluginCallback<TDefinitions[name]['result']> | undefined,

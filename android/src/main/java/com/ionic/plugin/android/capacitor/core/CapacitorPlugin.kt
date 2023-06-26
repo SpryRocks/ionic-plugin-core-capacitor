@@ -8,6 +8,8 @@ import com.ionic.plugin.android.core.utils.ActivityResultObserver
 import com.ionic.plugin.android.core.utils.IActivityResultObserver
 import com.ionic.plugin.core.actions.Delegate
 import com.ionic.plugin.core.actions.Mappers
+import com.spryrocks.kson.JsonObject
+import com.spryrocks.kson.mutableJsonObject
 
 abstract class CapacitorPlugin<TActionKey, TDelegate : Delegate<TMappers>, TMappers: Mappers> : com.getcapacitor.Plugin() {
     private val plugin: com.ionic.plugin.core.Plugin<TActionKey, TDelegate, TMappers>
@@ -38,5 +40,9 @@ abstract class CapacitorPlugin<TActionKey, TDelegate : Delegate<TMappers>, TMapp
         WrapperDelegate {
         override val activity: Activity
             get() = wrapper.activity
+
+        override fun sendEvent(name: String, data: JsonObject) {
+            wrapper.notifyListeners(name, data.toJSObject())
+        }
     }
 }

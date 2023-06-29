@@ -1,5 +1,6 @@
 import {IDefinitions, PluginProxy} from './definitions';
 import {IPluginLogger, LogParams, LogType} from './logger';
+import {Capacitor} from '@capacitor/core';
 import {Mappers} from './mappers';
 
 type LogEvent = {
@@ -84,8 +85,10 @@ export abstract class CapacitorPlugin<
   }
 
   private registerEvents() {
-    this.plugin.addListener('log', (event) => {
-      this.processLogEventReceived(event as LogEvent);
-    });
+    if (Capacitor.getPlatform() !== 'web') {
+      this.plugin.addListener('log', (event) => {
+        this.processLogEventReceived(event as LogEvent);
+      });
+    }
   }
 }

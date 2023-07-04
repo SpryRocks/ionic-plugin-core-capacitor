@@ -1,5 +1,18 @@
+import {
+  createLoggerFactory,
+  GlobalData,
+  ILoggerObserver,
+  LogData,
+  LoggerObserver,
+  prepareLogData,
+} from './logger';
 import {IDefinitions, PluginProxy} from './definitions';
-import {IPluginLogger, LogParams, LogType} from './logger';
+import {
+  LoggerFactory,
+  LogParams,
+  LogType,
+  MultipleNotifiers,
+} from '@spryrocks/logger-plugin';
 import {Capacitor} from '@capacitor/core';
 import {Mappers} from './mappers';
 
@@ -12,7 +25,7 @@ type LogEvent = {
 };
 
 export interface ICapacitorPlugin {
-  addLogger(logger: IPluginLogger): void;
+  get logObserver(): ILoggerObserver;
 }
 
 export abstract class CapacitorPlugin<
@@ -20,29 +33,38 @@ export abstract class CapacitorPlugin<
   TMappers extends Mappers,
 > implements ICapacitorPlugin
 {
-  private static readonly staticLoggers: IPluginLogger[] = [];
+  private static readonly _logObserver = new LoggerObserver();
+
+  private readonly _logObserver = new LoggerObserver();
+
+  private readonly _logNotifiers = new MultipleNotifiers([
+    this._logObserver,
+    CapacitorPlugin._logObserver,
+  ]);
+
+  private readonly _loggerFactory: LoggerFactory<LogData, GlobalData>;
 
   protected abstract readonly mappers: TMappers;
 
-  private readonly loggers: IPluginLogger[] = [];
-
-  public constructor(
+  protected constructor(
     private readonly plugin: PluginProxy<TDefinitions>,
     private readonly options: {
       name: string;
     },
   ) {
+    this._loggerFactory = createLoggerFactory({
+      notifier: this._logNotifiers,
+      plugin: this.options?.name ?? 'Unknown plugin',
+    });
     this.registerEvents();
   }
 
-  public static addLogger(logger: IPluginLogger) {
-    CapacitorPlugin.staticLoggers.push(logger);
+  // noinspection JSUnusedGlobalSymbols
+  protected createLogger(tag?: string, action?: string) {
+    return this._loggerFactory.createLogger(tag, {globalData: {action}});
   }
 
-  public addLogger(logger: IPluginLogger) {
-    this.loggers.push(logger);
-  }
-
+  // noinspection JSUnusedGlobalSymbols
   protected call<TMethod extends keyof TDefinitions>(
     method: TMethod,
     options: TDefinitions[TMethod]['options'],
@@ -52,6 +74,7 @@ export abstract class CapacitorPlugin<
     );
   }
 
+  // noinspection JSUnusedGlobalSymbols
   protected observe<TMethod extends keyof TDefinitions>(
     method: TMethod,
     options: TDefinitions[TMethod]['options'],
@@ -72,16 +95,21 @@ export abstract class CapacitorPlugin<
   }
 
   private processLogEventReceived(event: LogEvent) {
-    for (let logger of [...CapacitorPlugin.staticLoggers, ...this.loggers]) {
-      logger.onLogReceived({
-        type: event.type,
-        plugin: this.options.name,
-        action: event.action,
-        tag: event.tag,
-        message: event.message,
-        params: event.params,
-      });
-    }
+    this._logNotifiers.notify(
+      prepareLogData({
+        data: {
+          tag: event.tag,
+          message: event.message,
+          params: event.params,
+          type: event.type,
+        },
+        globalData: {
+          plugin: this.options.name,
+          action: event.action,
+          isNative: true,
+        },
+      }),
+    );
   }
 
   private registerEvents() {
@@ -90,5 +118,14 @@ export abstract class CapacitorPlugin<
         this.processLogEventReceived(event as LogEvent);
       });
     }
+  }
+
+  // noinspection JSUnusedGlobalSymbols
+  public static get logObserver(): ILoggerObserver {
+    return this._logObserver;
+  }
+
+  public get logObserver(): ILoggerObserver {
+    return this._logObserver;
   }
 }

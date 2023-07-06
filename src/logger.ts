@@ -1,21 +1,40 @@
-export enum LogType {
-  Warning = 'Warning',
-  Debug = 'Debug',
-  Info = 'Info',
-  Error = 'Error',
-}
+import {
+  CoreLogData as CoreCoreLogData,
+  ILoggerObserver as CoreILoggerObserver,
+  LogData as CoreLogData,
+  LoggerObserver as CoreLoggerObserver,
+  ILoggerNotifier,
+  LoggerFactory,
+} from '@spryrocks/logger-plugin';
 
-export type LogParams = {[key: string]: string};
+export type LogData = CoreLogData & {isNative: boolean};
 
-export type LogData = {
-  type: LogType;
+export interface ILoggerObserver extends CoreILoggerObserver {}
+
+export class LoggerObserver extends CoreLoggerObserver<LogData> {}
+
+export type GlobalData = {action: string | undefined; isNative: boolean; plugin: string};
+
+export const prepareLogData = ({
+  data,
+  globalData,
+}: {
+  data: CoreCoreLogData;
+  globalData: GlobalData;
+}): LogData => ({
+  ...data,
+  isNative: globalData.isNative,
+  plugin: globalData.plugin,
+  action: globalData.action,
+});
+
+export const createLoggerFactory = (options: {
+  notifier: ILoggerNotifier<LogData>;
   plugin: string;
-  action: string | undefined;
-  tag: string | undefined;
-  message: string;
-  params: LogParams;
+}) => {
+  return new LoggerFactory<LogData, GlobalData>({
+    notifier: options.notifier,
+    globalData: {plugin: options.plugin, action: undefined, isNative: false},
+    prepareLogData,
+  });
 };
-
-export interface IPluginLogger {
-  onLogReceived: (data: LogData) => void;
-}

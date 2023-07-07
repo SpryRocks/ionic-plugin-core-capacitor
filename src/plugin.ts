@@ -9,15 +9,15 @@ import {
 import {IDefinitions, PluginProxy} from './definitions';
 import {
   LoggerFactory,
+  LogLevel,
   LogParams,
-  LogType,
   MultipleNotifiers,
 } from '@spryrocks/logger-plugin';
 import {Capacitor} from '@capacitor/core';
 import {Mappers} from './mappers';
 
 type LogEvent = {
-  type: LogType;
+  type: LogLevel;
   action: string | undefined;
   tag: string | undefined;
   message: string;
@@ -101,7 +101,8 @@ export abstract class CapacitorPlugin<
           tag: event.tag,
           message: event.message,
           params: event.params,
-          type: event.type,
+          level: event.type,
+          error: undefined,
         },
         globalData: {
           plugin: this.options.name,

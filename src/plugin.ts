@@ -46,7 +46,8 @@ export abstract class CapacitorPlugin<
 
   protected abstract readonly mappers: TMappers;
 
-  protected constructor(
+  // noinspection TypeScriptAbstractClassConstructorCanBeMadeProtected
+  constructor(
     private readonly plugin: PluginProxy<TDefinitions>,
     private readonly options: {
       name: string;

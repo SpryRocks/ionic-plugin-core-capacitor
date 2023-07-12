@@ -17,7 +17,7 @@ import {Capacitor} from '@capacitor/core';
 import {Mappers} from './mappers';
 
 type LogEvent = {
-  type: LogLevel;
+  level: LogLevel;
   action: string | undefined;
   tag: string | undefined;
   message: string;
@@ -101,7 +101,7 @@ export abstract class CapacitorPlugin<
           tag: event.tag,
           message: event.message,
           params: event.params,
-          level: event.type,
+          level: event.level,
           error: undefined,
         },
         globalData: {

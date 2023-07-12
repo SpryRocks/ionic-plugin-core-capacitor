@@ -6,6 +6,7 @@ import {
   LoggerObserver,
   prepareLogData,
 } from './logger';
+import {ErrorDetails, Mappers} from './mappers';
 import {IDefinitions, PluginProxy} from './definitions';
 import {
   LoggerFactory,
@@ -14,7 +15,6 @@ import {
   MultipleNotifiers,
 } from '@spryrocks/logger-plugin';
 import {Capacitor} from '@capacitor/core';
-import {Mappers} from './mappers';
 
 type LogEvent = {
   level: LogLevel;
@@ -30,7 +30,7 @@ export interface ICapacitorPlugin {
 
 export abstract class CapacitorPlugin<
   TDefinitions extends IDefinitions,
-  TMappers extends Mappers,
+  TMappers extends Mappers<ErrorDetails>,
 > implements ICapacitorPlugin
 {
   private static readonly _logObserver = new LoggerObserver();

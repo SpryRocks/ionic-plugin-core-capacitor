@@ -6,9 +6,9 @@ export interface ErrorDetails {
   message: string | undefined;
 }
 
-export abstract class Mappers<TErrorDetails extends ErrorDetails> {
-  protected mapError(details: TErrorDetails): PluginError {
-    return new PluginError(details.message ?? 'Unknown error');
+export abstract class Mappers<TErrorDetails extends ErrorDetails = ErrorDetails> {
+  protected decodePluginError(details: TErrorDetails): PluginError {
+    return new PluginError(details.message);
   }
 
   protected mapUnknownError(error: unknown): PluginError {
@@ -22,22 +22,31 @@ export abstract class Mappers<TErrorDetails extends ErrorDetails> {
     if (typeof error === 'string') {
       message = error;
     }
-    throw new PluginError(message ?? 'Unknown error');
+    return new PluginError(message);
+  }
+
+  protected mapError(error: PluginError): PluginError {
+    return error;
   }
 
   handlePluginError<T>(error: RawError | unknown): T {
     console.log('Mappers', 'handlePluginError', {error});
+    const pluginError = this.decodeCapacitorError(error);
+    throw this.mapError(pluginError);
+  }
+
+  private decodeCapacitorError(error: unknown): PluginError {
     if (typeof error === 'object' && error != null) {
       const error_ = error as RawError;
       if (error_.data && typeof error_.data === 'object') {
-        throw this.mapError(error_.data as TErrorDetails);
+        return this.decodePluginError(error_.data as TErrorDetails);
       }
       if (error_.code && typeof error_.code === 'string') {
         const details = this.decodeErrorDetailsFromCode(error_.code);
-        if (details) throw this.mapError(details);
+        if (details) return this.decodePluginError(details);
       }
     }
-    throw this.mapUnknownError(error);
+    return this.mapUnknownError(error);
   }
 
   private decodeErrorDetailsFromCode(code: string): TErrorDetails | undefined {

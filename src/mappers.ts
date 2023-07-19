@@ -30,6 +30,7 @@ export abstract class Mappers<TErrorDetails extends ErrorDetails = ErrorDetails>
   }
 
   handlePluginError<T>(error: RawError | unknown): T {
+    // eslint-disable-next-line no-console
     console.log('Mappers', 'handlePluginError', {error});
     const pluginError = this.decodeCapacitorError(error);
     throw this.mapError(pluginError);

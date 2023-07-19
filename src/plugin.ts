@@ -28,6 +28,11 @@ export interface ICapacitorPlugin {
   get logObserver(): ILoggerObserver;
 }
 
+export type PluginOptions<TDefinitions extends IDefinitions> = {
+  name: string;
+  proxy: PluginProxy<TDefinitions>;
+};
+
 export abstract class CapacitorPlugin<
   TDefinitions extends IDefinitions,
   TMappers extends Mappers,
@@ -47,12 +52,7 @@ export abstract class CapacitorPlugin<
   protected abstract readonly mappers: TMappers;
 
   // noinspection TypeScriptAbstractClassConstructorCanBeMadeProtected
-  constructor(
-    private readonly plugin: PluginProxy<TDefinitions>,
-    private readonly options: {
-      name: string;
-    },
-  ) {
+  constructor(private readonly options: PluginOptions<TDefinitions>) {
     this._loggerFactory = createLoggerFactory({
       notifier: this._logNotifiers,
       plugin: this.options?.name ?? 'Unknown plugin',
@@ -129,5 +129,9 @@ export abstract class CapacitorPlugin<
 
   public get logObserver(): ILoggerObserver {
     return this._logObserver;
+  }
+
+  public get plugin() {
+    return this.options.proxy;
   }
 }

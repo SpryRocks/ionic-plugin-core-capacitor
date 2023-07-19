@@ -1,6 +1,6 @@
 export class PluginError extends Error {
-  constructor(public override readonly message: string) {
-    super(message);
+  constructor(message?: string) {
+    super(message ?? 'Unknown error');
     Object.setPrototypeOf(this, new.target.prototype);
   }
 }

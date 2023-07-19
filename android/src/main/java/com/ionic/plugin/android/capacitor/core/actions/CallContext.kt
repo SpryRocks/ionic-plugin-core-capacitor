@@ -98,7 +98,7 @@ class CallContext(
     private fun reject(finish: Boolean, message: String, data: JsonObject?) {
         setFinish(finish)
         if (data != null) {
-            call.reject(message, json.toString())
+            call.reject(message, data.toString())
         } else {
             call.reject(message)
         }

@@ -21,7 +21,8 @@ class CallContext(
         throw PluginException("Not implemented")
     }
 
-    class AsObject(private val call: PluginCall) : com.ionic.plugin.core.actions.CallContext.AsObject() {
+    class AsObject(private val call: PluginCall) :
+        com.ionic.plugin.core.actions.CallContext.AsObject() {
         override fun opt(name: String) = throw NotImplementedError()
 
         override fun optString(name: String) = nullable(name) { call.getString(name) }
@@ -63,31 +64,47 @@ class CallContext(
     }
 
     override fun success(data: Any?, finish: Boolean) {
-      if (!finish) call.save()
-        when(data) {
-            null -> call.resolve()
-            is JsonObject -> call.resolve(data.toJSObject())
+        when (data) {
+            null -> resolve(finish)
+            is JsonObject -> resolve(finish, data)
             else -> throw NotImplementedError("This data type is not supported")
         }
     }
 
     override fun error(error: Throwable?, finish: Boolean) {
-        if (!finish) call.save()
-        val exception: Exception? = when (error) {
-            is Exception -> error
-            is Throwable -> Exception(error)
-            else -> null
+      val exception: Exception? = when (error) {
+        is Exception -> error
+        is Throwable -> Exception(error)
+        else -> null
+      }
+
+      val defaultMessage = "Unknown error"
+
+      val message = exception?.message ?: defaultMessage
+      val data = (exception as? PluginExceptionBase)?.let(mappers.errorMapper::mapToJson)
+
+      reject(finish, message, data)
+    }
+
+    private fun resolve(finish: Boolean, data: JsonObject? = null) {
+        setFinish(finish)
+        if (data != null) {
+            call.resolve(data.toJSObject())
+        } else {
+            call.resolve()
         }
+    }
 
-        val defaultMessage = "Unknown error"
-
-        val message = exception?.message ?: defaultMessage
-        val json = (exception as? PluginExceptionBase)?.let(mappers.errorMapper::mapToJson)
-
-        if (json != null) {
+    private fun reject(finish: Boolean, message: String, data: JsonObject?) {
+        setFinish(finish)
+        if (data != null) {
             call.reject(message, json.toString())
         } else {
             call.reject(message)
         }
+    }
+
+    private fun setFinish(finish: Boolean) {
+      if (!finish) call.save()
     }
 }

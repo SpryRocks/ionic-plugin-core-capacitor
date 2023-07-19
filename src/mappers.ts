@@ -1,29 +1,60 @@
 import {PluginError} from './error';
 
-type RawError = {message: unknown; code: unknown};
+type RawError = {message: unknown; code: unknown; data: unknown};
 
-export abstract class Mappers {
-  protected abstract mapError(
-    message: string | undefined,
-    details: object | undefined,
-  ): PluginError;
+export interface ErrorDetails {
+  message: string | undefined;
+}
 
-  handlePluginError<T>(error: RawError | unknown): Promise<T> {
+export abstract class Mappers<TErrorDetails extends ErrorDetails = ErrorDetails> {
+  protected decodePluginError(details: TErrorDetails): PluginError {
+    return new PluginError(details.message);
+  }
+
+  protected mapUnknownError(error: unknown): PluginError {
     let message: string | undefined;
-    let details: object | undefined;
     if (typeof error === 'object' && error != null) {
       const error_ = error as RawError;
       if (error_.message && typeof error_.message === 'string') {
         message = error_.message;
       }
+    }
+    if (typeof error === 'string') {
+      message = error;
+    }
+    return new PluginError(message);
+  }
+
+  protected mapError(error: PluginError): PluginError {
+    return error;
+  }
+
+  handlePluginError<T>(error: RawError | unknown): T {
+    // eslint-disable-next-line no-console
+    console.log('Mappers', 'handlePluginError', {error});
+    const pluginError = this.decodeCapacitorError(error);
+    throw this.mapError(pluginError);
+  }
+
+  private decodeCapacitorError(error: unknown): PluginError {
+    if (typeof error === 'object' && error != null) {
+      const error_ = error as RawError;
+      if (error_.data && typeof error_.data === 'object') {
+        return this.decodePluginError(error_.data as TErrorDetails);
+      }
       if (error_.code && typeof error_.code === 'string') {
-        try {
-          details = JSON.parse(error_.code);
-        } catch (e) {
-          details = {};
-        }
+        const details = this.decodeErrorDetailsFromCode(error_.code);
+        if (details) return this.decodePluginError(details);
       }
     }
-    return Promise.reject(this.mapError(message, details));
+    return this.mapUnknownError(error);
+  }
+
+  private decodeErrorDetailsFromCode(code: string): TErrorDetails | undefined {
+    try {
+      return JSON.parse(code) as TErrorDetails;
+    } catch (e) {
+      return undefined;
+    }
   }
 }

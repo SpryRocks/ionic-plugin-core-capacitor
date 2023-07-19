@@ -71,8 +71,23 @@ class CallContext(
         }
     }
 
+    override fun error(error: Throwable?, finish: Boolean) {
+      val exception: Exception? = when (error) {
+        is Exception -> error
+        is Throwable -> Exception(error)
+        else -> null
+      }
+
+      val defaultMessage = "Unknown error"
+
+      val message = exception?.message ?: defaultMessage
+      val data = (exception as? PluginExceptionBase)?.let(mappers.errorMapper::mapToJson)
+
+      reject(finish, message, data)
+    }
+
     private fun resolve(finish: Boolean, data: JsonObject? = null) {
-        call.setKeepAlive(!finish)
+        setFinish(finish)
         if (data != null) {
             call.resolve(data.toJSObject())
         } else {
@@ -80,27 +95,16 @@ class CallContext(
         }
     }
 
-    override fun error(error: Throwable?, finish: Boolean) {
-        val exception: Exception? = when (error) {
-            is Exception -> error
-            is Throwable -> Exception(error)
-            else -> null
-        }
-
-        val defaultMessage = "Unknown error"
-
-        val message = exception?.message ?: defaultMessage
-        val data = (exception as? PluginExceptionBase)?.let(mappers.errorMapper::mapToJson)
-
-        reject(finish, message, data)
-    }
-
     private fun reject(finish: Boolean, message: String, data: JsonObject?) {
-        call.setKeepAlive(!finish)
+        setFinish(finish)
         if (data != null) {
             call.reject(message, data.toJSObject())
         } else {
             call.reject(message)
         }
+    }
+
+    private fun setFinish(finish: Boolean) {
+      call.setKeepAlive(!finish)
     }
 }

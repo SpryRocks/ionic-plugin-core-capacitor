@@ -116,9 +116,14 @@ export abstract class CapacitorPlugin<
 
   private registerEvents() {
     if (Capacitor.getPlatform() !== 'web') {
-      this.plugin.addListener('log', (event) => {
-        this.processLogEventReceived(event as LogEvent);
-      });
+      try {
+        this.plugin.addListener('log', (event) => {
+          this.processLogEventReceived(event as LogEvent);
+        });
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.error(e);
+      }
     }
   }
 

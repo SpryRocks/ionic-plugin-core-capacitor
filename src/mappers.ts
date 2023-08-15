@@ -29,11 +29,9 @@ export abstract class Mappers<TErrorDetails extends ErrorDetails = ErrorDetails>
     return error;
   }
 
-  handlePluginError<T>(error: RawError | unknown): T {
-    // eslint-disable-next-line no-console
-    console.log('Mappers', 'handlePluginError', {error});
+  createPluginError(error: RawError | unknown): PluginError {
     const pluginError = this.decodeCapacitorError(error);
-    throw this.mapError(pluginError);
+    return this.mapError(pluginError);
   }
 
   private decodeCapacitorError(error: unknown): PluginError {

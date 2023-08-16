@@ -15,6 +15,7 @@ import {
 } from '@spryrocks/logger-plugin';
 import {Capacitor} from '@capacitor/core';
 import {Mappers} from './mappers';
+import {PluginError} from './error';
 
 type LogEvent = {
   level: LogLevel;
@@ -70,9 +71,11 @@ export abstract class CapacitorPlugin<
     method: TMethod,
     options: TDefinitions[TMethod]['options'],
   ): Promise<TDefinitions[TMethod]['result']> {
-    return (
-      this.plugin[method](options, undefined) as Promise<TDefinitions[TMethod]['result']>
-    ).catch((error) => this.mappers.handlePluginError(error));
+    return this.plugin[method](options, undefined).catch((error) => {
+      const pluginError = this.mappers.createPluginError(error);
+      this.logPluginError(method, pluginError);
+      throw pluginError;
+    });
   }
 
   // noinspection JSUnusedGlobalSymbols
@@ -86,13 +89,19 @@ export abstract class CapacitorPlugin<
   ): Promise<string> {
     const result = this.plugin[method](options, (data, error) => {
       if (error) {
-        callback.error(this.mappers.handlePluginError(error));
+        const pluginError = this.mappers.createPluginError(error);
+        this.logPluginError(method, pluginError);
+        callback.error(pluginError);
         return;
       }
 
       callback.next(data);
-    }) as string;
-    return Promise.resolve(result);
+    }) as Promise<string>;
+    return result.catch((error) => {
+      const pluginError = this.mappers.createPluginError(error);
+      this.logPluginError(method, pluginError);
+      callback.error(pluginError);
+    }) as Promise<string>;
   }
 
   private processLogEventReceived(event: LogEvent) {
@@ -125,6 +134,11 @@ export abstract class CapacitorPlugin<
         console.error(e);
       }
     }
+  }
+
+  private logPluginError(method: string | number | symbol, error: PluginError) {
+    const logger = this.createLogger(undefined, method.toString());
+    logger.error(error);
   }
 
   // noinspection JSUnusedGlobalSymbols

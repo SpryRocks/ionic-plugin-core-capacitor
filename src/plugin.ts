@@ -1,3 +1,4 @@
+import {CallbackId, CallbackResult, IDefinitions, PluginProxy} from './definitions';
 import {
   createLoggerFactory,
   GlobalData,
@@ -6,7 +7,6 @@ import {
   LoggerObserver,
   prepareLogData,
 } from './logger';
-import {IDefinitions, PluginProxy} from './definitions';
 import {
   LoggerFactory,
   LogLevel,
@@ -67,41 +67,49 @@ export abstract class CapacitorPlugin<
   }
 
   // noinspection JSUnusedGlobalSymbols
-  protected call<TMethod extends keyof TDefinitions>(
+  protected async call<TMethod extends keyof TDefinitions>(
     method: TMethod,
     options: TDefinitions[TMethod]['options'],
   ): Promise<TDefinitions[TMethod]['result']> {
-    return this.plugin[method](options, undefined).catch((error) => {
+    try {
+      return await this.plugin[method](options, undefined);
+    } catch (error) {
       const pluginError = this.mappers.createPluginError(error);
       this.logPluginError(method, pluginError);
       throw pluginError;
-    });
+    }
   }
 
   // noinspection JSUnusedGlobalSymbols
-  protected observe<TMethod extends keyof TDefinitions>(
+  protected async observe<TMethod extends keyof TDefinitions>(
     method: TMethod,
     options: TDefinitions[TMethod]['options'],
     callback: {
       next: (result: TDefinitions[TMethod]['result']) => void;
       error: (error: unknown) => void;
     },
-  ): Promise<string> {
-    const result = this.plugin[method](options, (data, error) => {
-      if (error) {
-        const pluginError = this.mappers.createPluginError(error);
-        this.logPluginError(method, pluginError);
-        callback.error(pluginError);
-        return;
-      }
+  ): CallbackResult {
+    try {
+      const callbackResult = this.plugin[method](options, (data, error) => {
+        if (error) {
+          const pluginError = this.mappers.createPluginError(error);
+          this.logPluginError(method, pluginError);
+          callback.error(pluginError);
+          return;
+        }
 
-      callback.next(data);
-    }) as Promise<string>;
-    return result.catch((error) => {
+        callback.next(data);
+      }) as CallbackResult;
+      return await this.mapCallbackResult(callbackResult);
+    } catch (error) {
       const pluginError = this.mappers.createPluginError(error);
       this.logPluginError(method, pluginError);
-      callback.error(pluginError);
-    }) as Promise<string>;
+      throw pluginError;
+    }
+  }
+
+  private mapCallbackResult(callbackResult: CallbackResult): Promise<CallbackId> {
+    return callbackResult;
   }
 
   private processLogEventReceived(event: LogEvent) {

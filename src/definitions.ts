@@ -4,11 +4,12 @@ export type IDefinitions = {
   [name: string]: IAction<unknown, unknown>;
 };
 
-type CallbackId = string;
+export type CallbackId = string;
 type PluginCallback<TData> = (
   data: TData | undefined,
   error: unknown | undefined,
 ) => void;
+export type CallbackResult = Promise<CallbackId>;
 
 type CapPluginListener = (event: unknown) => void;
 
@@ -20,5 +21,5 @@ export type PluginProxy<TDefinitions extends IDefinitions> = CapPlugin & {
   [name in keyof TDefinitions]: (
     options: TDefinitions[name]['options'],
     callback: PluginCallback<TDefinitions[name]['result']> | undefined,
-  ) => Promise<TDefinitions[name]['result']> | CallbackId;
+  ) => Promise<TDefinitions[name]['result']> | CallbackResult;
 };

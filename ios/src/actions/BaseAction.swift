@@ -1,9 +1,10 @@
 import Capacitor
 
-open class CoreBaseAction<TDelegate, TMappers> where TDelegate : CoreDelegate, TMappers : CoreMappers {
+open class CoreBaseAction<TDelegate, TMappers>: WithLogger where TDelegate : CoreDelegate, TMappers : CoreMappers {
     struct Session {
         let delegate: TDelegate
         let mappers: TMappers
+        let pluginLogger: IPluginLogger
     }
     
     private var session_: Session? = nil
@@ -16,8 +17,8 @@ open class CoreBaseAction<TDelegate, TMappers> where TDelegate : CoreDelegate, T
         self.call = call
     }
     
-    public func initialize(delegate: TDelegate, mappers: TMappers) {
-        session_ = Session(delegate: delegate, mappers: mappers)
+    public func initialize(delegate: TDelegate, mappers: TMappers, pluginLogger: IPluginLogger) {
+        session_ = Session(delegate: delegate, mappers: mappers, pluginLogger: pluginLogger)
     }
     
     open func onExecute() throws {}
@@ -54,5 +55,19 @@ open class CoreBaseAction<TDelegate, TMappers> where TDelegate : CoreDelegate, T
     
     public func error(_ error: Error? = nil, finish: Bool = true) {
         mappers.reportError(error, call: call, finish: finish)
+    }
+    
+    public func logger(tag: String?) -> ILogger {
+        return Logger(action: getClassName(), tag: tag, pluginLogger: session.pluginLogger)
+    }
+    
+    public func logger() -> ILogger {
+        return logger(tag: nil)
+    }
+    
+    private func getClassName() -> String {
+        let fullName = String(describing: self)
+        let parts = fullName.split(separator: ".")
+        return parts.last!.description
     }
 }

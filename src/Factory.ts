@@ -1,8 +1,6 @@
-import {CreatePlugin, PluginRegistration} from './IFactory';
+import {CreatePlugin, CreatePluginOptions} from './IFactory';
 import {IDefinitions, PluginProxy} from './definitions';
 import {Plugins} from '@capacitor/core';
-
-type CreatePluginOptions = {web?: PluginRegistration; cap2?: {pluginName: string}};
 
 export const createPlugin: CreatePlugin = <TPlugin>(
   pluginName: string,

@@ -4,7 +4,6 @@ public class Logger : NSObject, ILogger {
     private let tag: String?
     private let pluginLogger: IPluginLogger
     
-    @objc
     public init(action: String?, tag: String?, pluginLogger: IPluginLogger) {
         self.action = action
         self.tag = tag

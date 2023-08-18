@@ -61,7 +61,7 @@ open class CorePlugin<TDelegate : CoreDelegate, TMappers: CoreMappers>: IPluginL
         let context = CallContext(call: call, mappers: mappers)
         do {
             let action = try actionType.init(call: context)
-            action.initialize(delegate: delegate, mappers: mappers)
+            action.initialize(delegate: delegate, mappers: mappers, pluginLogger: self)
             try action.onExecute()
         } catch {
             reportError(error, call: context, finish: true)

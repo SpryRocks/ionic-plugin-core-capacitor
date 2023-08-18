@@ -3,12 +3,11 @@ import {
   createLoggerFactory,
   GlobalData,
   ILoggerObserver,
-  LogData,
   LoggerObserver,
   prepareLogData,
 } from './logger';
 import {
-  LoggerFactory,
+  ILoggerFactory,
   LogLevel,
   LogParams,
   MultipleNotifiers,
@@ -48,7 +47,7 @@ export abstract class CapacitorPlugin<
     CapacitorPlugin._logObserver,
   ]);
 
-  private readonly _loggerFactory: LoggerFactory<LogData, GlobalData>;
+  private readonly _loggerFactory: ILoggerFactory<GlobalData>;
 
   protected abstract readonly mappers: TMappers;
 

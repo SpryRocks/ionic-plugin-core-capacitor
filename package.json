@@ -1,6 +1,6 @@
 {
   "name": "@spryrocks/capacitor-ionic-core-plugin",
-  "version": "2.3.6-alpha.0",
+  "version": "2.3.7",
   "description": "Ionic plugin core capacitor",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
@@ -8,6 +8,7 @@
   "unpkg": "dist/plugin.js",
   "license": "MIT",
   "author": "",
+  "type": "module",
   "repository": {
     "url": "https://github.com/SpryRocks/ionic-plugin-core-capacitor"
   },
@@ -19,38 +20,26 @@
     "ios/"
   ],
   "scripts": {
-    "compile:native": "npm run build:android",
-    "build:android": "(cd android && ./gradlew build)",
     "lint": "eslint './**/*.{ts,tsx}' --cache",
     "build": "npm run clean && tsc && rollup -c rollup.config.js",
     "clean": "rimraf ./dist",
-    "build:develop": "tsc --watch",
     "prepublishOnly": "npm run build",
     "compile": "tsc --noEmit"
   },
   "dependencies": {
-    "@spryrocks/logger-plugin": "^0.1.1"
+    "@spryrocks/logger-plugin": "^0.1.11"
   },
   "peerDependencies": {
     "@capacitor/core": "^2.4.7"
   },
   "devDependencies": {
-    "@capacitor/android": "^2.4.7",
     "@capacitor/core": "^2.4.7",
     "@spryrocks/eslint-config": "^0.2.8-alpha.0",
-    "rimraf": "^3.0.2",
-    "rollup": "^2.79.1",
-    "typescript": "^4.9.4"
+    "rimraf": "^5.0.1",
+    "rollup": "^3.28.0",
+    "typescript": "^5.1.6"
   },
   "publishConfig": {
     "access": "public"
-  },
-  "capacitor": {
-    "android": {
-      "src": "android"
-    },
-    "ios": {
-      "src": "ios"
-    }
   }
 }

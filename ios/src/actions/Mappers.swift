@@ -17,14 +17,14 @@ open class CoreMappers {
 open class CoreErrorMapper {
     public init() {}
     
-    func map(_ error: Error) -> PluginError {
+    open func map(_ error: Error) -> PluginError {
         if (error is PluginError) {
             return error as! PluginError
         }
-        return PluginError(message: "Unknown error", cause: error)
+        return PluginError(message: error.localizedDescription, cause: error)
     }
     
-    func mapToJson(_ error_: Error) -> PluginCallResultData? {
+    open func mapToJson(_ error_: Error) -> PluginCallResultData? {
         if (!(error_ is PluginError)) {
             return nil
         }

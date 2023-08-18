@@ -3,6 +3,7 @@ import {
   ILoggerObserver as CoreILoggerObserver,
   LogData as CoreLogData,
   LoggerObserver as CoreLoggerObserver,
+  ILoggerFactory,
   ILoggerNotifier,
   LoggerFactory,
 } from '@spryrocks/logger-plugin';
@@ -31,7 +32,7 @@ export const prepareLogData = ({
 export const createLoggerFactory = (options: {
   notifier: ILoggerNotifier<LogData>;
   plugin: string;
-}) => {
+}): ILoggerFactory<GlobalData> => {
   return new LoggerFactory<LogData, GlobalData>({
     notifier: options.notifier,
     globalData: {plugin: options.plugin, action: undefined, isNative: false},

@@ -41,5 +41,13 @@
   },
   "publishConfig": {
     "access": "public"
+  },
+  "capacitor": {
+    "android": {
+      "src": "android"
+    },
+    "ios": {
+      "src": "ios"
+    }
   }
 }

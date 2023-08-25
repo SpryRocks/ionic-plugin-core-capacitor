@@ -1,6 +1,6 @@
 {
   "name": "@spryrocks/capacitor-ionic-core-plugin",
-  "version": "2.3.9",
+  "version": "2.4.0-alpha.1",
   "description": "Ionic plugin core capacitor",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
@@ -8,7 +8,6 @@
   "unpkg": "dist/plugin.js",
   "license": "MIT",
   "author": "",
-  "type": "module",
   "repository": {
     "url": "https://github.com/SpryRocks/ionic-plugin-core-capacitor"
   },
@@ -21,13 +20,13 @@
   ],
   "scripts": {
     "lint": "eslint './**/*.{ts,tsx}' --cache",
-    "build": "npm run clean && tsc && rollup -c rollup.config.js",
+    "build": "npm run clean && tsc && rollup -c rollup.config.mjs",
     "clean": "rimraf ./dist",
     "prepublishOnly": "npm run build",
     "compile": "tsc --noEmit"
   },
   "dependencies": {
-    "@spryrocks/logger-plugin": "^0.1.11"
+    "@spryrocks/logger-plugin": "^0.1.14"
   },
   "peerDependencies": {
     "@capacitor/core": "^2.4.7"
@@ -36,7 +35,7 @@
     "@capacitor/core": "^2.4.7",
     "@spryrocks/eslint-config": "^0.2.8-alpha.0",
     "rimraf": "^5.0.1",
-    "rollup": "^3.28.0",
+    "rollup": "^3.28.1",
     "typescript": "^5.1.6"
   },
   "publishConfig": {

@@ -9,16 +9,22 @@ public class CallContext {
         self.mappers = mappers
     }
     
-    public func getString(_ key: String) -> String {
-        return optString(key)!
+    public func getString(_ key: String) throws -> String {
+        guard let result = optString(key) else {
+            throw PluginError(message: "Value for required string '\(key)' is nil")
+        }
+        return result
     }
     
     public func optString(_ key: String) -> String? {
         return call.getString(key)
     }
     
-    public func getObject(_ key: String) -> JsObject {
-        return optObject(key)!
+    public func getObject(_ key: String) throws -> JsObject {
+        guard let result = optObject(key) else {
+            throw PluginError(message: "Value for required object '\(key)' is nil")
+        }
+        return result
     }
     
     public func optObject(_ key: String) -> JsObject? {
@@ -27,8 +33,11 @@ public class CallContext {
         return JsObject(raw: raw)
     }
     
-    public func getArray(_ key: String) -> JsArray {
-        return optArray(key)!
+    public func getArray(_ key: String) throws -> JsArray {
+        guard let result = optArray(key) else {
+            throw PluginError(message: "Value for required array '\(key)' is nil")
+        }
+        return result
     }
     
     public func optArray(_ key: String) -> JsArray? {
@@ -73,8 +82,11 @@ public class CallContext {
 public class JsObject {
     public let raw: JSObject
     
-    public func getString(_ key: String) -> String {
-        return optString(key)!
+    public func getString(_ key: String) throws -> String {
+        guard let result = optString(key) else {
+            throw PluginError(message: "Value for required string '\(key)' is nil")
+        }
+        return result
     }
     
     public func optString(_ key: String) -> String? {

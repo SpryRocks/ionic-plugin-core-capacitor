@@ -7,6 +7,7 @@ import {
   prepareLogData,
 } from './logger';
 import {
+  ErrorLevel,
   ILoggerFactory,
   LogLevel,
   LogParams,
@@ -120,6 +121,7 @@ export abstract class CapacitorPlugin<
           params: event.params,
           level: event.level,
           error: undefined,
+          errorLevel: ErrorLevel.Medium,
         },
         globalData: {
           plugin: this.options.name,
@@ -145,7 +147,7 @@ export abstract class CapacitorPlugin<
 
   private logPluginError(method: string | number | symbol, error: PluginError) {
     const logger = this.createLogger(undefined, method.toString());
-    logger.error(error);
+    logger.error(error, undefined, {level: ErrorLevel.Medium});
   }
 
   // noinspection JSUnusedGlobalSymbols

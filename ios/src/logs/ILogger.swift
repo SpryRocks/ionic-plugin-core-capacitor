@@ -1,3 +1,4 @@
+@objc
 public protocol WithLogger {
     func logger(tag: String?) -> ILogger
     func logger() -> ILogger
@@ -16,6 +17,7 @@ public protocol IPluginLogger {
     func sendLog(_ action: String?, _ tag: String?, _ type: LogType, _ message: String, _ params: LogParams?)
 }
 
+@objc
 public protocol ILogger {
     func warning(message: String, params: LogParams?)
     func warning(message: String)

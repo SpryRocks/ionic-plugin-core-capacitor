@@ -1,13 +1,42 @@
-import {CreatePlugin, CreatePluginOptions} from './IFactory';
+import {
+  CreateCapacitorPlugin,
+  CreateCapacitorPluginOptions,
+  CreatePlugin,
+  CreatePluginOptions,
+  PluginConstructor,
+} from './IFactory';
 import {IDefinitions, PluginProxy} from './definitions';
+import {CapacitorPlugin} from './plugin';
+import {Mappers} from './mappers';
 import {registerPlugin} from '@capacitor/core';
 
-export const createPlugin: CreatePlugin = <TPlugin>(
-  pluginName: string,
-  options?: CreatePluginOptions,
-): TPlugin => registerPlugin<TPlugin>(pluginName, {web: options?.web});
+export const createCapacitorPlugin: CreateCapacitorPlugin = <TPlugin>(
+  options: CreateCapacitorPluginOptions,
+): TPlugin => registerPlugin<TPlugin>(options.pluginName, {web: options?.web});
 
-export const createPluginProxy = <TDefinitions extends IDefinitions>(
-  pluginName: string,
-  options?: CreatePluginOptions,
-) => createPlugin<PluginProxy<TDefinitions>>(pluginName, options);
+export const createCapacitorPluginProxy = <TDefinitions extends IDefinitions>(
+  options: CreateCapacitorPluginOptions,
+) => createCapacitorPlugin<PluginProxy<TDefinitions>>(options);
+
+export const createPlugin: CreatePlugin = <
+  TPlugin extends CapacitorPlugin<TDefinitions, TMappers>,
+  TDefinitions extends IDefinitions,
+  TMappers extends Mappers,
+>(
+  pluginConstructor: PluginConstructor<TPlugin, TDefinitions, TMappers>,
+  options: CreatePluginOptions,
+): TPlugin => {
+  const proxy = createCapacitorPluginProxy<TDefinitions>({
+    pluginName: options.pluginName,
+  });
+  if (!proxy) {
+    // eslint-disable-next-line
+    // @ts-ignore
+    return undefined;
+  }
+  return new pluginConstructor({
+    pluginName: options.pluginName,
+    pluginLogName: options.pluginLogName,
+    proxy,
+  });
+};

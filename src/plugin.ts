@@ -1,4 +1,10 @@
-import {CallbackId, CallbackResult, IDefinitions, PluginProxy} from './definitions';
+import {
+  CallbackId,
+  CallbackResult,
+  CapPluginListener,
+  IDefinitions,
+  PluginProxy,
+} from './definitions';
 import {
   createLoggerFactory,
   GlobalData,
@@ -13,7 +19,6 @@ import {
   LogParams,
   MultipleNotifiers,
 } from '@spryrocks/logger-plugin';
-import {Capacitor} from '@capacitor/core';
 import {Mappers} from './mappers';
 import {PluginError} from './error';
 
@@ -30,7 +35,8 @@ export interface ICapacitorPlugin {
 }
 
 export type PluginOptions<TDefinitions extends IDefinitions> = {
-  name: string;
+  pluginName: string;
+  pluginLogName: string;
   proxy: PluginProxy<TDefinitions>;
 };
 
@@ -56,10 +62,22 @@ export abstract class CapacitorPlugin<
   constructor(private readonly options: PluginOptions<TDefinitions>) {
     this._loggerFactory = createLoggerFactory({
       notifier: this._logNotifiers,
-      plugin: this.options?.name ?? 'Unknown plugin',
+      plugin: this.options?.pluginLogName,
     });
-    this.registerEvents();
+    if (this.isEventsEnabled()) {
+      this.initializeEventsInternal();
+      this.initializeEvents();
+    }
   }
+
+  private initializeEventsInternal() {
+    this.addEventListenerInternal<LogEvent>(
+      'log',
+      this.processLogEventReceived.bind(this),
+    );
+  }
+
+  protected initializeEvents() {}
 
   // noinspection JSUnusedGlobalSymbols
   protected createLogger(tag?: string, action?: string) {
@@ -72,7 +90,7 @@ export abstract class CapacitorPlugin<
     options: TDefinitions[TMethod]['options'],
   ): Promise<TDefinitions[TMethod]['result']> {
     try {
-      return await this.plugin[method](options, undefined);
+      return await this.proxy[method](options, undefined);
     } catch (error) {
       const pluginError = this.mappers.createPluginError(error);
       this.logPluginError(method, pluginError);
@@ -90,7 +108,7 @@ export abstract class CapacitorPlugin<
     },
   ): CallbackResult {
     try {
-      const callbackResult = this.plugin[method](options, (data, error) => {
+      const callbackResult = this.proxy[method](options, (data, error) => {
         if (error) {
           const pluginError = this.mappers.createPluginError(error);
           this.logPluginError(method, pluginError);
@@ -112,6 +130,39 @@ export abstract class CapacitorPlugin<
     return callbackResult;
   }
 
+  protected addEventListenerInternal<TListener>(
+    name: string,
+    listener: CapPluginListener<TListener>,
+  ) {
+    try {
+      this.proxy.addListener(name, (event) => {
+        console.log('CapacitorPlugin', 'event received', name, event);
+        listener(event as TListener);
+      });
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error(`Cannot register ${name} listener`, e);
+    }
+  }
+
+  protected isEventsEnabled() {
+    // if (!this.isPluginAvailableInCapacitor()) return false;
+    // if (this.isWeb()) return false;
+
+    return true; // remove this method after implementation on web
+  }
+
+  // noinspection JSUnusedGlobalSymbols
+  protected addEventListener<TMethod extends keyof TDefinitions>(
+    name: TMethod,
+    listener: CapPluginListener<TDefinitions[TMethod]['result']>,
+  ) {
+    this.addEventListenerInternal<TDefinitions[TMethod]['result']>(
+      name as string,
+      listener,
+    );
+  }
+
   private processLogEventReceived(event: LogEvent) {
     this._logNotifiers.notify(
       prepareLogData({
@@ -124,7 +175,7 @@ export abstract class CapacitorPlugin<
           errorLevel: ErrorLevel.Medium,
         },
         globalData: {
-          plugin: this.options.name,
+          plugin: this.options.pluginLogName,
           action: event.action,
           isNative: true,
         },
@@ -132,18 +183,13 @@ export abstract class CapacitorPlugin<
     );
   }
 
-  private registerEvents() {
-    if (Capacitor.getPlatform() !== 'web') {
-      try {
-        this.plugin.addListener('log', (event) => {
-          this.processLogEventReceived(event as LogEvent);
-        });
-      } catch (e) {
-        // eslint-disable-next-line no-console
-        console.error(e);
-      }
-    }
-  }
+  // private isPluginAvailableInCapacitor() {
+  //   return Capacitor.isPluginAvailable(this.options.pluginName);
+  // }
+
+  // private isWeb() {
+  //   return Capacitor.getPlatform() !== 'web';
+  // }
 
   private logPluginError(method: string | number | symbol, error: PluginError) {
     const logger = this.createLogger(undefined, method.toString());
@@ -159,7 +205,7 @@ export abstract class CapacitorPlugin<
     return this._logObserver;
   }
 
-  public get plugin() {
+  public get proxy() {
     return this.options.proxy;
   }
 }

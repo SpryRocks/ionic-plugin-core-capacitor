@@ -11,10 +11,10 @@ type PluginCallback<TData> = (
 ) => void;
 export type CallbackResult = Promise<CallbackId>;
 
-type CapPluginListener = (event: unknown) => void;
+export type CapPluginListener<TEvent> = (event: TEvent) => void;
 
 type CapPlugin = {
-  addListener: (name: string, listener: CapPluginListener) => void;
+  addListener: <TEvent>(name: string, listener: CapPluginListener<TEvent>) => void;
 };
 
 export type PluginProxy<TDefinitions extends IDefinitions> = CapPlugin & {

@@ -28,6 +28,8 @@ export const createPlugin: CreatePlugin = <
 ): TPlugin => {
   const proxy = createCapacitorPluginProxy<TDefinitions>({
     pluginName: options.pluginName,
+    web: options.web,
+    cap2: options.cap2,
   });
   if (!proxy) {
     // eslint-disable-next-line

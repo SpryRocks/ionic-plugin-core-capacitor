@@ -26,7 +26,7 @@ open class CorePlugin<TDelegate : CoreDelegate, TMappers: CoreMappers>: IPluginL
         session_ = Session(wrapperDelegate: wrapperDelegate)
     }
     
-    public func sendLog(_ action: String?, _ tag: String?, _ type: LogType, _ message: String, _ params: LogParams?) {
+    public func sendLog(_ action: String?, _ tag: String?, _ type: LogType, _ message: String, _ params: LogParams) {
         var data = Dictionary<String, Any>()
         data["type"] = getLogTypeValue(type)
         if (action != nil) {
@@ -77,7 +77,7 @@ open class CorePlugin<TDelegate : CoreDelegate, TMappers: CoreMappers>: IPluginL
     }
     
     public func logger(tag: String?) -> ILogger {
-        return Logger(action: nil, tag: tag, pluginLogger: self)
+        return Logger(action: nil, tag: tag, params: nil, pluginLogger: self)
     }
     
     public func logger() -> ILogger {

@@ -58,7 +58,7 @@ open class CoreBaseAction<TDelegate, TMappers>: WithLogger where TDelegate : Cor
     }
     
     public func logger(tag: String?) -> ILogger {
-        return Logger(action: getClassName(), tag: tag, pluginLogger: session.pluginLogger)
+        return Logger(action: getClassName(), tag: tag, params: nil, pluginLogger: session.pluginLogger)
     }
     
     public func logger() -> ILogger {

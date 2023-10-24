@@ -20,6 +20,17 @@ public class CallContext {
         return call.getString(key)
     }
     
+    public func getInt(_ key: String) throws -> Int {
+        guard let result = optInt(key) else {
+            throw PluginError(message: "Value for required int '\(key)' is nil")
+        }
+        return result
+    }
+    
+    public func optInt(_ key: String) throws -> Int? {
+        return call.getInt(key)
+    }
+    
     public func getObject(_ key: String) throws -> JsObject {
         guard let result = optObject(key) else {
             throw PluginError(message: "Value for required object '\(key)' is nil")

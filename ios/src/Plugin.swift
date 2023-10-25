@@ -5,7 +5,7 @@ public protocol ICorePluginInitializer {
     func initialize(wrapperDelegate: CapacitorPluginDelegate)
 }
 
-open class CorePlugin<TDelegate : CoreDelegate, TMappers: CoreMappers>: IPluginLogger, ICorePluginInitializer, WithLogger {
+open class CorePlugin<TDelegate : CoreDelegate, TMappers: CoreMappers>: IPluginLogger, ICorePluginInitializer, WithLogger, PluginCallbackInternal, IEventSender {
     private struct Session {
         let wrapperDelegate: CapacitorPluginDelegate
     }
@@ -26,53 +26,33 @@ open class CorePlugin<TDelegate : CoreDelegate, TMappers: CoreMappers>: IPluginL
         session_ = Session(wrapperDelegate: wrapperDelegate)
     }
     
-    public func sendLog(_ action: String?, _ tag: String?, _ type: LogType, _ message: String, _ params: LogParams) {
-        var data = Dictionary<String, Any>()
-        data["type"] = getLogTypeValue(type)
-        if (action != nil) {
-            data["action"] = action
+    public func sendEvent(_ event: ICoreEvent) {
+        if (event is CoreBaseEvent<TDelegate, CoreMappers>) {
+            (event as! CoreBaseEvent<TDelegate, CoreMappers>).initialize(callback: self, delegate: delegate, mappers: mappers)
         }
-        if (tag != nil) {
-            data["tag"] = tag
-        }
-        data["message"] = message
-        if (params != nil) {
-            data["params"] = params
-        } else {
-            data["params"] = [:] as Dictionary<String, Any>
-        }
-        wrapperDelegate.sendEvent("log", data)
+        wrapperDelegate.sendEvent(event.name, event.getData())
     }
     
-    private func getLogTypeValue(_ type: LogType) -> String {
-        switch(type) {
-        case .Warning:
-            return "Warning"
-        case .Debug:
-            return "Debug"
-        case .Info:
-            return "Info"
-        case .Error:
-            return "Error"
-        }
+    public func sendLog(_ action: String?, _ tag: String?, _ type: LogType, _ message: String, _ params: LogParams) {
+        sendEvent(LogEvent<TDelegate, TMappers>(action: action, tag: tag, type: type, message: message, params: params))
     }
-
+    
     public func call(_ actionType: CoreBaseAction<TDelegate, TMappers>.Type, _ call: CAPPluginCall) {
         let context = CallContext(call: call, mappers: mappers)
         do {
             let action = try actionType.init(call: context)
-            action.initialize(delegate: delegate, mappers: mappers, pluginLogger: self)
+            action.initialize(callback: self, delegate: delegate, mappers: mappers)
             try action.onExecute()
         } catch {
             reportError(error, call: context, finish: true)
         }
     }
     
-    func reportSuccess(_ data: PluginCallResultData?, call: CallContext, finish: Bool) {
+    public func reportSuccess(_ data: PluginCallResultData?, call: CallContext, finish: Bool) {
         mappers.reportSuccess(data, call: call, finish: finish)
     }
     
-    func reportError(_ error: Error?, call: CallContext, finish: Bool) {
+    public func reportError(_ error: Error?, call: CallContext, finish: Bool) {
         mappers.reportError(error, call: call, finish: finish)
     }
     

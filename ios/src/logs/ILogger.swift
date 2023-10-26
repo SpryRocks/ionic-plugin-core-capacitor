@@ -14,7 +14,7 @@ public enum LogType: Int {
 }
 
 public protocol IPluginLogger {
-    func sendLog(_ action: String?, _ tag: String?, _ type: LogType, _ message: String, _ params: LogParams?)
+    func sendLog(_ action: String?, _ tag: String?, _ type: LogType, _ message: String, _ params: LogParams)
 }
 
 @objc
@@ -28,4 +28,6 @@ public protocol ILogger {
     func error(message: String, params: LogParams?)
     func error(message: String)
     func tag(_ tag: String) -> ILogger
+    func child() -> ILogger
+    func updateParams(_ params: LogParams)
 }

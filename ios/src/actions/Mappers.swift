@@ -24,7 +24,7 @@ open class CoreErrorMapper {
         return PluginError(message: error.localizedDescription, cause: error)
     }
     
-    open func mapToJson(_ error_: Error) -> PluginCallResultData? {
+    open func mapToJson(_ error_: Error) -> JsonObject? {
         if (!(error_ is PluginError)) {
             return nil
         }

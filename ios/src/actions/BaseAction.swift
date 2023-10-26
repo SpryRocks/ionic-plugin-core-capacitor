@@ -1,24 +1,9 @@
 import Capacitor
 
-open class CoreBaseAction<TDelegate, TMappers>: WithLogger where TDelegate : CoreDelegate, TMappers : CoreMappers {
-    struct Session {
-        let delegate: TDelegate
-        let mappers: TMappers
-        let pluginLogger: IPluginLogger
-    }
-    
-    private var session_: Session? = nil
-    private var session: Session { get { return session_! }}
-    public var delegate: TDelegate { get { return session.delegate }}
-    public var mappers: TMappers { get { return session.mappers }}
-    private var call: CallContext
-    
-    public required init(call: CallContext) throws {
-        self.call = call
-    }
-    
-    public func initialize(delegate: TDelegate, mappers: TMappers, pluginLogger: IPluginLogger) {
-        session_ = Session(delegate: delegate, mappers: mappers, pluginLogger: pluginLogger)
+open class CoreBaseAction<TDelegate, TMappers>: ContextWithCall<TDelegate, TMappers>, WithLogger, IEventSender where TDelegate : CoreDelegate, TMappers : CoreMappers {
+
+    required public override init(call: CallContext) throws {
+        try super.init(call: call)
     }
     
     open func onExecute() throws {}
@@ -44,7 +29,7 @@ open class CoreBaseAction<TDelegate, TMappers>: WithLogger where TDelegate : Cor
     }
     
     public func success(_ data: PluginCallResultData? = nil, finish: Bool = true) {
-        mappers.reportSuccess(data, call: call, finish: finish)
+        callback.reportSuccess(data, call: call, finish: finish)
     }
     
     public func success(_ data: Encodable, finish: Bool = true, serialize: Bool) {
@@ -54,11 +39,11 @@ open class CoreBaseAction<TDelegate, TMappers>: WithLogger where TDelegate : Cor
     }
     
     public func error(_ error: Error? = nil, finish: Bool = true) {
-        mappers.reportError(error, call: call, finish: finish)
+        callback.reportError(error, call: call, finish: finish)
     }
     
     public func logger(tag: String?) -> ILogger {
-        return Logger(action: getClassName(), tag: tag, pluginLogger: session.pluginLogger)
+        return Logger(action: getClassName(), tag: tag, params: nil, pluginLogger: callback)
     }
     
     public func logger() -> ILogger {
@@ -69,5 +54,9 @@ open class CoreBaseAction<TDelegate, TMappers>: WithLogger where TDelegate : Cor
         let fullName = String(describing: self)
         let parts = fullName.split(separator: ".")
         return parts.last!.description
+    }
+    
+    public func sendEvent(_ event: ICoreEvent) {
+        callback.sendEvent(event)
     }
 }

@@ -5,7 +5,7 @@ public protocol ICorePluginInitializer {
     func initialize(wrapperDelegate: CapacitorPluginDelegate)
 }
 
-open class CorePlugin<TDelegate : CoreDelegate, TMappers: CoreMappers>: IPluginLogger, ICorePluginInitializer, WithLogger, PluginCallbackInternal, IEventSender {
+open class CorePlugin<TDelegate : CoreDelegate, TMappers: CoreMappers>: IPluginLogger, ICorePluginInitializer, WithLogger, WithLoggerLegacy, PluginCallbackInternal, IEventSender {
     private struct Session {
         let wrapperDelegate: CapacitorPluginDelegate
     }
@@ -62,5 +62,13 @@ open class CorePlugin<TDelegate : CoreDelegate, TMappers: CoreMappers>: IPluginL
     
     public func logger() -> ILogger {
         return logger(tag: nil)
+    }
+    
+    public func loggerLegacy(tag: String?) -> ILoggerLegacy {
+        return LoggerLegacy(action: nil, tag: tag, params: nil, pluginLogger: self)
+    }
+    
+    public func loggerLegacy() -> ILoggerLegacy {
+        return loggerLegacy(tag: nil)
     }
 }

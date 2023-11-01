@@ -9,74 +9,8 @@ public class CallContext {
         self.mappers = mappers
     }
     
-    public func getString(_ key: String) throws -> String {
-        guard let result = optString(key) else {
-            throw PluginError(message: "Value for required string '\(key)' is nil")
-        }
-        return result
-    }
-    
-    public func optString(_ key: String) -> String? {
-        return call.getString(key)
-    }
-    
-    public func getInt(_ key: String) throws -> Int {
-        guard let result = optInt(key) else {
-            throw PluginError(message: "Value for required int '\(key)' is nil")
-        }
-        return result
-    }
-    
-    public func optInt(_ key: String) -> Int? {
-        return call.getInt(key)
-    }
-    
-    public func getDouble(_ key: String) throws -> Double {
-        guard let result = optDouble(key) else {
-            throw PluginError(message: "Value for required double '\(key)' is nil")
-        }
-        return result
-    }
-    
-    public func optDouble(_ key: String) -> Double? {
-        return call.getDouble(key)
-    }
-    
-    public func getBool(_ key: String) throws -> Bool {
-        guard let result = optBool(key) else {
-            throw PluginError(message: "Value for required bool '\(key)' is nil")
-        }
-        return result
-    }
-    
-    public func optBool(_ key: String) -> Bool? {
-        return call.getBool(key)
-    }
-    
-    public func getObject(_ key: String) throws -> JsObject {
-        guard let result = optObject(key) else {
-            throw PluginError(message: "Value for required object '\(key)' is nil")
-        }
-        return result
-    }
-    
-    public func optObject(_ key: String) -> JsObject? {
-        guard let raw = call.getObject(key)
-        else { return nil }
-        return JsObject(raw: raw)
-    }
-    
-    public func getArray(_ key: String) throws -> JsArray {
-        guard let result = optArray(key) else {
-            throw PluginError(message: "Value for required array '\(key)' is nil")
-        }
-        return result
-    }
-    
-    public func optArray(_ key: String) -> JsArray? {
-        guard let raw = call.getArray(key)
-        else { return nil }
-        return JsArray(raw: raw)
+    public func asObject() -> CallContextAsJsonObject {
+        return CallContextAsJsonObject(call: call)
     }
     
     public func success(_ data: PluginCallResultData?, finish: Bool) {
@@ -108,33 +42,95 @@ public class CallContext {
     private func prepareErrorData(_ error: Error?) -> PluginCallResultData? {
         if (error == nil) { return nil }
         let pluginError = mappers.errorMapper.map(error!)
-        return mappers.errorMapper.mapToJson(pluginError)
+        return mappers.errorMapper.mapToJson(pluginError)?.toRaw()
     }
 }
 
-public class JsObject {
-    public let raw: JSObject
+public class CallContextAsJsonObject: IJsonObjectProperties {
+    private let call: CAPPluginCall
     
-    public func getString(_ key: String) throws -> String {
-        guard let result = optString(key) else {
-            throw PluginError(message: "Value for required string '\(key)' is nil")
+    init(call: CAPPluginCall) {
+        self.call = call
+    }
+    
+    public func opt(_ name: String) -> JsonValue? {
+        return nil
+    }
+    
+    public func optString(_ name: String) -> String? {
+        return call.getString(name)
+    }
+    
+    public func optInt(_ name: String) -> Int? {
+        return call.getInt(name)
+    }
+    
+    public func optDouble(_ name: String) -> Double? {
+        return call.getDouble(name)
+    }
+    
+    public func optBool(_ name: String) -> Bool? {
+        return call.getBool(name)
+    }
+    
+    public func optObject(_ name: String) -> JsonObject? {
+        guard let raw = call.getObject(name)
+        else { return nil }
+        return JsonObject.fromRaw(raw)
+    }
+    
+    public func optArray(_ name: String) -> JsonArray? {
+        guard let raw = call.getArray(name)
+        else { return nil }
+        return JsonArray.fromRaw(raw)
+    }
+    
+    public func get(_ name: String) throws -> JsonValue {
+        guard let result = opt(name) else {
+            throw PluginError(message: "Value for required '\(name)' is nil")
         }
         return result
     }
     
-    public func optString(_ key: String) -> String? {
-        return raw[key] as! String?
+    public func getString(_ name: String) throws -> String {
+        guard let result = optString(name) else {
+            throw PluginError(message: "Value for required string '\(name)' is nil")
+        }
+        return result
     }
     
-    init(raw: JSObject) {
-        self.raw = raw
+    public func getInt(_ name: String) throws -> Int {
+        guard let result = optInt(name) else {
+            throw PluginError(message: "Value for required int '\(name)' is nil")
+        }
+        return result
     }
-}
-
-public class JsArray {
-    public let raw: JSArray
     
-    init(raw: JSArray) {
-        self.raw = raw
+    public func getDouble(_ name: String) throws -> Double {
+        guard let result = optDouble(name) else {
+            throw PluginError(message: "Value for required double '\(name)' is nil")
+        }
+        return result
+    }
+    
+    public func getBool(_ name: String) throws -> Bool {
+        guard let result = optBool(name) else {
+            throw PluginError(message: "Value for required bool '\(name)' is nil")
+        }
+        return result
+    }
+    
+    public func getObject(_ name: String) throws -> JsonObject {
+        guard let result = optObject(name) else {
+            throw PluginError(message: "Value for required object '\(name)' is nil")
+        }
+        return result
+    }
+    
+    public func getArray(_ name: String) throws -> JsonArray {
+        guard let result = optArray(name) else {
+            throw PluginError(message: "Value for required array '\(name)' is nil")
+        }
+        return result
     }
 }

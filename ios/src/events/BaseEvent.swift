@@ -12,6 +12,6 @@ open class CoreBaseEvent<TDelegate, TMappers>: Context<TDelegate, TMappers>, ICo
     }
     
     open func getData() -> JsonObject {
-        return [:]
+        return mutableJsonObject()
     }
 }

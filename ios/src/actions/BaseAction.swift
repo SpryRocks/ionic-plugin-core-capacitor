@@ -2,8 +2,8 @@ import Capacitor
 
 open class CoreBaseAction<TDelegate, TMappers>: ContextWithCall<TDelegate, TMappers>, WithLogger, IEventSender where TDelegate : CoreDelegate, TMappers : CoreMappers {
 
-    required public override init(call: CallContext) throws {
-        try super.init(call: call)
+    required public init(args: IJsonObjectProperties) throws {
+        super.init()
     }
     
     open func onExecute() throws {}

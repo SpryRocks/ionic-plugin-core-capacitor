@@ -1,7 +1,5 @@
 import Capacitor
 
-public typealias JsonObject = [String: Any?]
-
 public protocol IWebViewProvider {
     func getWebView() -> WKWebView?
 }
@@ -24,7 +22,7 @@ open class CapacitorPlugin: CAPPlugin, CapacitorPluginDelegate {
     }
     
     public func sendEvent(_ name: String, _ data: JsonObject) {
-        notifyListeners(name, data: data)
+        notifyListeners(name, data: data.toRaw())
     }
     
     public func getWebView() -> WKWebView? {

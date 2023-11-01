@@ -15,29 +15,17 @@ public class LogEvent<TDelegate, TMappers>: CoreBaseEvent<TDelegate, TMappers> w
     }
     
     public override func getData() -> JsonObject {
-        var data = Dictionary<String, Any>()
-        data["type"] = getLogTypeValue(type)
-        if (action != nil) {
-            data["action"] = action
+        let logMapper = mappers.logMapper
+        let data = mutableJsonObject()
+        data.put("type", logMapper.getLogTypeValue(type))
+        if let action = action {
+            data.put("action", action)
         }
-        if (tag != nil) {
-            data["tag"] = tag
+        if let tag = tag {
+            data.put("tag", tag)
         }
-        data["message"] = message
-        data["params"] = params
+        data.put("message", message)
+        data.put("params", logMapper.formatParams(params))
         return data
-    }
-    
-    private func getLogTypeValue(_ type: LogType) -> String {
-        switch(type) {
-        case .Warning:
-            return "Warning"
-        case .Debug:
-            return "Debug"
-        case .Info:
-            return "Info"
-        case .Error:
-            return "Error"
-        }
     }
 }

@@ -1,7 +1,19 @@
 open class ContextWithCall<TDelegate, TMappers>: Context<TDelegate, TMappers> where TDelegate : CoreDelegate, TMappers : CoreMappers {
-    let call: CallContext
+    private var _call: CallContext? = nil
     
-    init(call: CallContext) throws {
-        self.call = call
+    var call: CallContext { get { return _call! }}
+    
+    internal func initialize(
+        callback: any PluginCallbackInternal,
+        delegate: TDelegate,
+        mappers: TMappers,
+        call: CallContext
+    ) {
+        super.initialize(
+            callback: callback,
+            delegate: delegate,
+            mappers: mappers
+        )
+        self._call = call
     }
 }

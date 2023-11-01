@@ -7,7 +7,11 @@ open class Context<TDelegate, TMappers> where TDelegate : CoreDelegate, TMappers
     public var delegate: TDelegate { get { return _delegate! }}
     public var mappers: TMappers { get { return _mappers! }}
     
-    internal func initialize(callback: any PluginCallbackInternal, delegate: TDelegate, mappers: TMappers) {
+    internal func initialize(
+        callback: any PluginCallbackInternal,
+        delegate: TDelegate, 
+        mappers: TMappers
+    ) {
         _callback = callback
         _delegate = delegate
         _mappers = mappers

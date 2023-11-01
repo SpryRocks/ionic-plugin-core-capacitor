@@ -27,8 +27,8 @@ open class CorePlugin<TDelegate : CoreDelegate, TMappers: CoreMappers>: IPluginL
     }
     
     public func sendEvent(_ event: ICoreEvent) {
-        if (event is CoreBaseEvent<TDelegate, CoreMappers>) {
-            (event as! CoreBaseEvent<TDelegate, CoreMappers>).initialize(callback: self, delegate: delegate, mappers: mappers)
+        if (event is Context<TDelegate, TMappers>) {
+            (event as! Context).initialize(callback: self, delegate: delegate, mappers: mappers)
         }
         wrapperDelegate.sendEvent(event.name, event.getData())
     }
@@ -40,8 +40,8 @@ open class CorePlugin<TDelegate : CoreDelegate, TMappers: CoreMappers>: IPluginL
     public func call(_ actionType: CoreBaseAction<TDelegate, TMappers>.Type, _ call: CAPPluginCall) {
         let context = CallContext(call: call, mappers: mappers)
         do {
-            let action = try actionType.init(call: context)
-            action.initialize(callback: self, delegate: delegate, mappers: mappers)
+            let action = try actionType.init(args: context.asObject())
+            action.initialize(callback: self, delegate: delegate, mappers: mappers, call: context)
             try action.onExecute()
         } catch {
             reportError(error, call: context, finish: true)

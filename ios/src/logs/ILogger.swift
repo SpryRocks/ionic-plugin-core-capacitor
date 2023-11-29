@@ -5,15 +5,16 @@ public protocol WithLogger {
 
 public typealias LogParams = Dictionary<String, Any?>
 
-public enum LogType: Int {
+public enum LogLevel: Int {
     case Warning
     case Debug
     case Info
     case Error
+    case Trace
 }
 
 public protocol IPluginLogger {
-    func sendLog(_ action: String?, _ tag: String?, _ type: LogType, _ message: String, _ params: LogParams)
+    func sendLog(_ action: String?, _ tag: String?, _ type: LogLevel, _ message: String, _ params: LogParams)
 }
 
 public protocol ILogger {
@@ -25,6 +26,8 @@ public protocol ILogger {
     func info(message: String)
     func error(message: String, params: LogParams?)
     func error(message: String)
+    func trace(message: String, params: LogParams?)
+    func trace(message: String)
     func tag(_ tag: String) -> ILogger
     func child() -> ILogger
     func updateParams(_ params: LogParams)

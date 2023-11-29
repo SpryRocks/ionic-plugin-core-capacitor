@@ -86,7 +86,7 @@ open class CoreLogMapper {
         }
     }
     
-    internal func getLogTypeValue(_ type: LogType) -> String {
+    internal func getLogTypeValue(_ type: LogLevel) -> String {
         switch(type) {
         case .Warning:
             return "Warning"
@@ -96,6 +96,8 @@ open class CoreLogMapper {
             return "Info"
         case .Error:
             return "Error"
+        case .Trace:
+            return "Trace"
         }
     }
     

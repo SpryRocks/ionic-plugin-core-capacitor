@@ -33,8 +33,8 @@ open class CorePlugin<TDelegate : CoreDelegate, TMappers: CoreMappers>: IPluginL
         wrapperDelegate.sendEvent(event.name, event.getData())
     }
     
-    public func sendLog(_ action: String?, _ tag: String?, _ type: LogType, _ message: String, _ params: LogParams) {
-        sendEvent(LogEvent<TDelegate, TMappers>(action: action, tag: tag, type: type, message: message, params: params))
+    public func sendLog(_ action: String?, _ tag: String?, _ level: LogLevel, _ message: String, _ params: LogParams) {
+        sendEvent(LogEvent<TDelegate, TMappers>(action: action, tag: tag, level: level, message: message, params: params))
     }
     
     public func call(_ actionType: CoreBaseAction<TDelegate, TMappers>.Type, _ call: CAPPluginCall) {

@@ -12,7 +12,7 @@ public class Logger : NSObject, ILogger {
     }
 
     public func warning(message: String, params: LogParams?) {
-        pluginLogger.sendLog(action, tag, LogType.Warning, message, prepareParams(params))
+        pluginLogger.sendLog(action, tag, LogLevel.Warning, message, prepareParams(params))
     }
 
     public func warning(message: String) {
@@ -20,7 +20,7 @@ public class Logger : NSObject, ILogger {
     }
 
     public func debug(message: String, params: LogParams?) {
-        pluginLogger.sendLog(action, tag, LogType.Debug, message, prepareParams(params))
+        pluginLogger.sendLog(action, tag, LogLevel.Debug, message, prepareParams(params))
     }
 
     public func debug(message: String) {
@@ -28,7 +28,7 @@ public class Logger : NSObject, ILogger {
     }
 
     public func info(message: String, params: LogParams?) {
-        pluginLogger.sendLog(action, tag, LogType.Info, message, prepareParams(params))
+        pluginLogger.sendLog(action, tag, LogLevel.Info, message, prepareParams(params))
     }
 
     public func info(message: String) {
@@ -36,11 +36,19 @@ public class Logger : NSObject, ILogger {
     }
 
     public func error(message: String, params: LogParams?) {
-        pluginLogger.sendLog(action, tag, LogType.Error, message, prepareParams(params))
+        pluginLogger.sendLog(action, tag, LogLevel.Error, message, prepareParams(params))
     }
 
     public func error(message: String) {
         error(message: message, params: nil)
+    }
+
+    public func trace(message: String, params: LogParams?) {
+        pluginLogger.sendLog(action, tag, LogLevel.Trace, message, prepareParams(params))
+    }
+
+    public func trace(message: String) {
+        trace(message: message, params: nil)
     }
 
     public func tag(_ tag: String) -> ILogger {

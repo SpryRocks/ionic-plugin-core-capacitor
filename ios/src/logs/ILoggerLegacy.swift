@@ -16,6 +16,8 @@ public protocol ILoggerLegacy {
     func info(message: String)
     func error(message: String, params: LogParamsLegacy?)
     func error(message: String)
+    func trace(message: String, params: LogParamsLegacy?)
+    func trace(message: String)
     func tag(_ tag: String) -> ILoggerLegacy
     func child() -> ILoggerLegacy
     func updateParams(_ params: LogParamsLegacy)

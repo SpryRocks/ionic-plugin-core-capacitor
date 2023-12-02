@@ -1,7 +1,7 @@
 public typealias MutableJsonObjectInit = (_ obj: MutableJsonObject) -> Void
 public typealias MutableJsonArrayInit = (_ arr: MutableJsonArray) -> Void
 
-public func mutableJsonObject(initFunc: MutableJsonObjectInit? = nil) -> MutableJsonObject {
+public func mutableJsonObject(_ initFunc: MutableJsonObjectInit? = nil) -> MutableJsonObject {
     let obj = MutableJsonObject()
     if let initFunc = initFunc {
         initFunc(obj)
@@ -9,7 +9,7 @@ public func mutableJsonObject(initFunc: MutableJsonObjectInit? = nil) -> Mutable
     return obj
 }
 
-public func mutableJsonArray(initFunc: MutableJsonArrayInit? = nil) -> MutableJsonArray {
+public func mutableJsonArray(_ initFunc: MutableJsonArrayInit? = nil) -> MutableJsonArray {
     let arr = MutableJsonArray()
     if let initFunc = initFunc {
         initFunc(arr)

@@ -1,4 +1,4 @@
-public class JsonArray: JsonElement, IJsonArray {
+public class JsonArray: JsonElement, IJsonArray, Sequence {
     internal var arr: Array<JsonValueRaw?>
 
     internal init(_ arr: Array<JsonValueRaw?>) {
@@ -77,5 +77,9 @@ public class JsonArray: JsonElement, IJsonArray {
 
     public func toRaw() -> JsonArrayRaw {
         return arr
+    }
+    
+    public func makeIterator() -> JsonArrayIterator {
+        return JsonArrayIterator(self)
     }
 }

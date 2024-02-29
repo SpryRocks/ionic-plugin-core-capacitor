@@ -9,6 +9,7 @@ import {
   createLoggerFactory,
   GlobalData,
   ILoggerObserver,
+  LogData,
   LoggerObserver,
   prepareLogData,
 } from './logger';
@@ -32,6 +33,7 @@ type LogEvent = {
 
 export interface ICapacitorPlugin {
   get logObserver(): ILoggerObserver;
+  setLogLevels(logLevels: LogLevel[] | undefined): Promise<void>;
 }
 
 export type PluginOptions<TDefinitions extends IDefinitions> = {
@@ -49,12 +51,14 @@ export abstract class CapacitorPlugin<
 
   private readonly _logObserver = new LoggerObserver();
 
-  private readonly _logNotifiers = new MultipleNotifiers([
-    this._logObserver,
-    CapacitorPlugin._logObserver,
-  ]);
+  private readonly _logNotifiers = new MultipleNotifiers({
+    notifiers: [this._logObserver, CapacitorPlugin._logObserver],
+    filter: this.testLog.bind(this),
+  });
 
   private readonly _loggerFactory: ILoggerFactory<GlobalData>;
+
+  private logLevels: LogLevel[] | undefined;
 
   protected abstract readonly mappers: TMappers;
 
@@ -136,6 +140,7 @@ export abstract class CapacitorPlugin<
   ) {
     try {
       this.proxy.addListener(name, (event) => {
+        // eslint-disable-next-line no-console
         console.log('CapacitorPlugin', 'event received', name, event);
         listener(event as TListener);
       });
@@ -207,5 +212,18 @@ export abstract class CapacitorPlugin<
 
   public get proxy() {
     return this.options.proxy;
+  }
+
+  public async setLogLevels(logLevels: LogLevel[] | undefined) {
+    this.logLevels = logLevels;
+    await this.call('setLogLevels', {
+      logLevels: this.mappers.mapLogLevels(logLevels),
+    }).catch(() => {});
+  }
+
+  private testLog(data: LogData) {
+    const logLevels = this.logLevels;
+    if (!logLevels) return true;
+    return logLevels.includes(data.level);
   }
 }

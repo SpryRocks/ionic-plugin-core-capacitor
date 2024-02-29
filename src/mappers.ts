@@ -1,3 +1,4 @@
+import {LogLevel} from '@spryrocks/logger-plugin';
 import {PluginError} from './error';
 
 type RawError = {message: unknown; code: unknown; data: unknown};
@@ -54,5 +55,10 @@ export abstract class Mappers<TErrorDetails extends ErrorDetails = ErrorDetails>
     } catch (e) {
       return undefined;
     }
+  }
+
+  mapLogLevels(logLevels: LogLevel[] | undefined): string[] | undefined {
+    if (!logLevels) return undefined;
+    return logLevels.map((l) => l as string);
   }
 }

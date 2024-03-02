@@ -1,6 +1,6 @@
 {
   "name": "@spryrocks/capacitor-ionic-core-plugin",
-  "version": "2.7.0-alpha.0",
+  "version": "2.8.1-alpha.1",
   "description": "Ionic plugin core capacitor",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
@@ -26,7 +26,7 @@
     "compile": "tsc --noEmit"
   },
   "dependencies": {
-    "@spryrocks/logger-plugin": "^0.1.15-alpha.1"
+    "@spryrocks/logger-plugin": "^0.1.17-alpha.2"
   },
   "peerDependencies": {
     "@capacitor/core": "^2.4.7"

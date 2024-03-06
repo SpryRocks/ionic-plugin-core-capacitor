@@ -9,6 +9,7 @@ import {
   createLoggerFactory,
   GlobalData,
   ILoggerObserver,
+  LogData,
   LoggerObserver,
   prepareLogData,
 } from './logger';
@@ -19,6 +20,7 @@ import {
   LogParams,
   MultipleNotifiers,
 } from '@spryrocks/logger-plugin';
+import {Capacitor} from '@capacitor/core';
 import {Mappers} from './mappers';
 import {PluginError} from './error';
 
@@ -32,6 +34,7 @@ type LogEvent = {
 
 export interface ICapacitorPlugin {
   get logObserver(): ILoggerObserver;
+  setLogLevels(logLevels: LogLevel[] | undefined): Promise<void>;
 }
 
 export type PluginOptions<TDefinitions extends IDefinitions> = {
@@ -49,12 +52,14 @@ export abstract class CapacitorPlugin<
 
   private readonly _logObserver = new LoggerObserver();
 
-  private readonly _logNotifiers = new MultipleNotifiers([
-    this._logObserver,
-    CapacitorPlugin._logObserver,
-  ]);
+  private readonly _logNotifiers = new MultipleNotifiers({
+    notifiers: [this._logObserver, CapacitorPlugin._logObserver],
+    filter: this.testLog.bind(this),
+  });
 
   private readonly _loggerFactory: ILoggerFactory<GlobalData>;
+
+  private logLevels: LogLevel[] | undefined;
 
   protected abstract readonly mappers: TMappers;
 
@@ -136,6 +141,7 @@ export abstract class CapacitorPlugin<
   ) {
     try {
       this.proxy.addListener(name, (event) => {
+        // eslint-disable-next-line no-console
         console.log('CapacitorPlugin', 'event received', name, event);
         listener(event as TListener);
       });
@@ -147,7 +153,7 @@ export abstract class CapacitorPlugin<
 
   protected isEventsEnabled() {
     // if (!this.isPluginAvailableInCapacitor()) return false;
-    // if (this.isWeb()) return false;
+    if (this.isWeb()) return false;
 
     return true; // remove this method after implementation on web
   }
@@ -187,9 +193,9 @@ export abstract class CapacitorPlugin<
   //   return Capacitor.isPluginAvailable(this.options.pluginName);
   // }
 
-  // private isWeb() {
-  //   return Capacitor.getPlatform() !== 'web';
-  // }
+  private isWeb() {
+    return Capacitor.getPlatform() === 'web';
+  }
 
   private logPluginError(method: string | number | symbol, error: PluginError) {
     const logger = this.createLogger(undefined, method.toString());
@@ -207,5 +213,18 @@ export abstract class CapacitorPlugin<
 
   public get proxy() {
     return this.options.proxy;
+  }
+
+  public async setLogLevels(logLevels: LogLevel[] | undefined) {
+    this.logLevels = logLevels;
+    await this.call('setLogLevels', {
+      logLevels: this.mappers.mapLogLevels(logLevels),
+    }).catch(() => {});
+  }
+
+  private testLog(data: LogData) {
+    const logLevels = this.logLevels;
+    if (!logLevels) return true;
+    return logLevels.includes(data.level);
   }
 }

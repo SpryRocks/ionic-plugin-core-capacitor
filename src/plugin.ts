@@ -20,6 +20,7 @@ import {
   LogParams,
   MultipleNotifiers,
 } from '@spryrocks/logger-plugin';
+import {Capacitor} from '@capacitor/core';
 import {Mappers} from './mappers';
 import {PluginError} from './error';
 
@@ -152,7 +153,7 @@ export abstract class CapacitorPlugin<
 
   protected isEventsEnabled() {
     // if (!this.isPluginAvailableInCapacitor()) return false;
-    // if (this.isWeb()) return false;
+    if (this.isWeb()) return false;
 
     return true; // remove this method after implementation on web
   }
@@ -192,9 +193,9 @@ export abstract class CapacitorPlugin<
   //   return Capacitor.isPluginAvailable(this.options.pluginName);
   // }
 
-  // private isWeb() {
-  //   return Capacitor.getPlatform() !== 'web';
-  // }
+  private isWeb() {
+    return Capacitor.getPlatform() === 'web';
+  }
 
   private logPluginError(method: string | number | symbol, error: PluginError) {
     const logger = this.createLogger(undefined, method.toString());

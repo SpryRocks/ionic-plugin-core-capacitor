@@ -10,7 +10,14 @@ public class JsonArrayIterator: IteratorProtocol {
     }
     
     public func next() -> JsonValue? {
-        index += 1;
-        return jsonArray.opt(index)
+        var el: JsonValue? = nil
+        while (index < jsonArray.size - 1) {
+            index += 1
+            el = jsonArray.opt(index)
+            if (el != nil) {
+                break
+            }
+        }
+        return el
     }
 }

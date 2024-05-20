@@ -1,9 +1,20 @@
-public func mutableJsonObject() -> MutableJsonObject {
-    return MutableJsonObject()
+public typealias MutableJsonObjectInit = (_ obj: MutableJsonObject) -> Void
+public typealias MutableJsonArrayInit = (_ arr: MutableJsonArray) -> Void
+
+public func mutableJsonObject(_ initFunc: MutableJsonObjectInit? = nil) -> MutableJsonObject {
+    let obj = MutableJsonObject()
+    if let initFunc = initFunc {
+        initFunc(obj)
+    }
+    return obj
 }
 
-public func mutableJsonArray() -> MutableJsonArray {
-    return MutableJsonArray()
+public func mutableJsonArray(_ initFunc: MutableJsonArrayInit? = nil) -> MutableJsonArray {
+    let arr = MutableJsonArray()
+    if let initFunc = initFunc {
+        initFunc(arr)
+    }
+    return arr
 }
 
 func convertFromRawJsonElement(raw: JsonValueRaw?) -> JsonValue? {
@@ -16,10 +27,10 @@ func convertFromRawJsonElement(raw: JsonValueRaw?) -> JsonValue? {
         ) {
             return raw
         }
-        else if (raw is Array<Any>) {
-            return JsonArray(raw as! Array<Any>)
-        } else if (raw is Dictionary<String, Any>) {
-            return JsonObject(raw as! Dictionary<String, Any>)
+        else if let raw = raw as? Array<Any> {
+            return JsonArray(raw)
+        } else if let raw = raw as? Dictionary<String, Any> {
+            return JsonObject(raw)
         }
     }
     return nil

@@ -5,7 +5,6 @@ import com.ionic.plugin.android.capacitor.core.WrapperDelegate
 import com.ionic.plugin.android.capacitor.core.toJSObject
 import com.ionic.plugin.android.core.actions.CallContext
 import com.ionic.plugin.core.PluginException
-import com.ionic.plugin.core.PluginExceptionBase
 import com.ionic.plugin.core.actions.Mappers
 import com.spryrocks.kson.JsonArray
 import com.spryrocks.kson.JsonObject
@@ -68,16 +67,12 @@ class CallContext(
     }
 
     override fun error(error: Throwable?, finish: Boolean) {
-      val exception: Exception? = when (error) {
-        is Exception -> error
-        is Throwable -> Exception(error)
-        else -> null
-      }
+      val exception = error?.let(mappers.errorMapper::map)
 
       val defaultMessage = "Unknown error"
 
       val message = exception?.message ?: defaultMessage
-      val data = (exception as? PluginExceptionBase)?.let(mappers.errorMapper::mapToJson)
+      val data = exception?.let(mappers.errorMapper::mapToJson)
 
       reject(finish, message, data)
     }
